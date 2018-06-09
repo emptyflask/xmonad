@@ -152,6 +152,7 @@ myManageHook = composeAll [ matchAny v --> a | (v,a) <- myActions]
     where myActions =
             [ ("Xfrun4"                         , doFloat)
             , ("Xfce4-notifyd"                  , doIgnore)
+            , ("Xfce4-appfinder"                , doIgnore)
             , ("MPlayer"                        , doFloat)
             , ("mpv"                            , doFloat)
             , ("Oracle VM VirtualBox Manager"   , doShift "8")
