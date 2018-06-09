@@ -34,6 +34,7 @@ import XMonad.Layout.Named
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Reflect
 import XMonad.Layout.ResizableTile
+import XMonad.Layout.Spacing
 import XMonad.Layout.Tabbed
 import XMonad.Layout.TwoPane
 
@@ -44,18 +45,19 @@ conf = ewmh xfceConfig
         , layoutHook        = avoidStruts (myLayoutHook)
         , handleEventHook   = ewmhDesktopsEventHook <+> fullscreenEventHook 
         , borderWidth       = 1
-        , focusedBorderColor= "red"
+        , focusedBorderColor= "#dd0000"
         , normalBorderColor = "#444444"
-        , workspaces        = map show [1 .. 9 :: Int]
+        , workspaces        = map show [1 .. 6 :: Int]
         , modMask           = mod4Mask
         , keys              = myKeys
-         }
+        }
     -- where
         -- tall                = ResizableTall 1 (3/100) (1/2) []
 
 -- Main --
 main :: IO ()
 main =
+
     xmonad $ conf
         { startupHook       = startupHook conf
                             >> setWMName "LG3D" -- Java app focus fix
@@ -63,6 +65,10 @@ main =
          }
 
 myBar = "xmobar"
+
+-- myLogHook dest = dynamicLogWithPP defaultPP { ppOutput = hPutStrLn dest
+--                                             , ppVisible = wrap "(" ")"
+--                                             }
 
 -- Tabs theme --
 myTabTheme = defaultTheme
@@ -80,7 +86,7 @@ myTabTheme = defaultTheme
 -- Layouts --
 myLayoutHook = tile ||| rtile ||| full ||| mtile ||| gimp
   where
-    rt      = ResizableTall 1 (2/100) (1/2) []
+    rt      = smartSpacingWithEdge 5 $ ResizableTall 1 (2/100) (1/2) []
     -- normal vertical tile
     tile    = named "[]="   $ smartBorders rt
     rtile   = named "=[]"   $ reflectHoriz $ smartBorders rt
@@ -188,6 +194,7 @@ myManageHook = composeAll [ matchAny v --> a | (v,a) <- myActions]
             , ("animation-playbac"              , doFloat)
             , ("gimp-file-save"                 , doFloat)
             , ("file-jpeg"                      , doFloat)
+            , ("Wrapper-2.0"                    , doFloat)
             ]
 
 -- Helpers --
@@ -216,7 +223,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,                xK_t        ), withFocused $ windows . W.sink)
 
     -- refresh
-    , ((modMask,                xK_r        ), refresh)
+    , ((modMask .|. shiftMask,  xK_r        ), refresh)
 
     -- focus
     , ((modMask,                xK_Tab      ), windows W.focusDown)
