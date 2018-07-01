@@ -47,7 +47,7 @@ conf = ewmh xfceConfig
         , borderWidth       = 1
         , focusedBorderColor= "#dd0000"
         , normalBorderColor = "#444444"
-        , workspaces        = map show [1 .. 6 :: Int]
+        , workspaces        = map show [1 .. 9 :: Int]
         , modMask           = mod4Mask
         , keys              = myKeys
         }
@@ -152,7 +152,7 @@ myManageHook = composeAll [ matchAny v --> a | (v,a) <- myActions]
     where myActions =
             [ ("Xfrun4"                         , doFloat)
             , ("Xfce4-notifyd"                  , doIgnore)
-            , ("Xfce4-appfinder"                , doIgnore)
+            , ("Xfce4-appfinder"                , doFloat)
             , ("MPlayer"                        , doFloat)
             , ("mpv"                            , doFloat)
             , ("Oracle VM VirtualBox Manager"   , doShift "8")
