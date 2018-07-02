@@ -21,13 +21,18 @@ import System.Exit
 import XMonad
 import XMonad.Actions.CycleWS
 import XMonad.Actions.UpdatePointer
+import qualified XMonad.Actions.Search as Search
+import qualified XMonad.Actions.Submap as Submap
+
 import XMonad.Config.Xfce
+
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.InsertPosition
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.SetWMName
+
 import XMonad.Layout.ComboP
 import XMonad.Layout.Grid
 import XMonad.Layout.Named
@@ -38,40 +43,24 @@ import XMonad.Layout.Spacing
 import XMonad.Layout.Tabbed
 import XMonad.Layout.TwoPane
 
-conf = ewmh xfceConfig
-        { manageHook        = pbManageHook <+> myManageHook
-                                           <+> manageDocks
-                                           <+> manageHook xfceConfig
-        , layoutHook        = avoidStruts (myLayoutHook)
-        , handleEventHook   = ewmhDesktopsEventHook <+> fullscreenEventHook 
-        , borderWidth       = 1
-        , focusedBorderColor= "#dd0000"
-        , normalBorderColor = "#444444"
-        , workspaces        = map show [1 .. 9 :: Int]
-        , modMask           = mod4Mask
-        , keys              = myKeys
-        }
-    -- where
-        -- tall                = ResizableTall 1 (3/100) (1/2) []
+import qualified XMonad.Prompt as Prompt
+import XMonad.Prompt.Man
+import XMonad.Prompt.Ssh
 
--- Main --
-main :: IO ()
-main =
+import XMonad.Util.Run
 
-    xmonad $ conf
-        { startupHook       = startupHook conf
-                            >> setWMName "LG3D" -- Java app focus fix
-        , logHook           =  ewmhDesktopsLogHook
-         }
-
-myBar = "xmobar"
+-- myBar = "xmobar"
 
 -- myLogHook dest = dynamicLogWithPP defaultPP { ppOutput = hPutStrLn dest
 --                                             , ppVisible = wrap "(" ")"
 --                                             }
 
+
+myWorkspaces =
+  ["main","mail","work","chat","5","6","7","games","music"]
+
 -- Tabs theme --
-myTabTheme = defaultTheme
+myTabTheme = def
     { activeColor           = "white"
     , inactiveColor         = "grey"
     , urgentColor           = "red"
@@ -131,7 +120,7 @@ role = stringProperty "WM_WINDOW_ROLE"
 pbManageHook :: ManageHook
 pbManageHook = composeAll $ concat
     [ [ manageDocks ]
-    , [ manageHook defaultConfig ]
+    , [ manageHook def ]
     , [ isDialog --> doCenterFloat ]
     , [ isFullscreen --> doFullFloat ]
     , [ fmap not isDialog --> doF avoidMaster ]
@@ -252,15 +241,23 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask .|. shiftMask,  xK_h        ), sendMessage MirrorShrink)
     , ((modMask .|. shiftMask,  xK_l        ), sendMessage MirrorExpand)
 
+    -- search
+    , ((modMask, xK_s), Submap.submap $ searchEngineMap $ Search.promptSearch Prompt.def)
+    , ((modMask .|. shiftMask, xK_s), Submap.submap $ searchEngineMap $ Search.selectSearch)
+
     -- quit, or restart
     , ((modMask .|. shiftMask,  xK_q        ), spawn "xfce4-session-logout")
     , ((mod1Mask .|. shiftMask, xK_q        ), spawn "xscreensaver-command --lock")
 
     -- Restart xmonad
-    , ((modMask              , xK_q     ), restart "xmonad" True)
+    , ((modMask,                xK_q        ), restart "xmonad" True)
 
-    -- ungrab mouse cursor from applications which can grab it (games)
+    -- ungrab mouse cursor from applications which can grab it
     , ((modMask,                xK_i        ), spawn "xdotool key XF86Ungrab")
+
+    , ((modMask,                xK_s        ), sshPrompt Prompt.def)
+    , ((modMask,                xK_F1       ), manPrompt Prompt.def)
+
     ]
     ++
     -- mod-[1..9] %! Switch to workspace N
@@ -275,3 +272,33 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_e, xK_w, xK_r] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+
+------------------------------------------------------------------------
+
+searchEngineMap method = M.fromList $
+       [ ((0, xK_g), method Search.google)
+       , ((0, xK_h), method Search.hoogle)
+       , ((0, xK_w), method Search.wikipedia)
+       , ((0, xK_y), method Search.youtube)
+       ]
+       
+conf = ewmh xfceConfig
+        { manageHook        = pbManageHook <+> myManageHook
+                                           <+> manageDocks
+                                           <+> manageHook xfceConfig
+        , layoutHook        = avoidStruts (myLayoutHook)
+        , handleEventHook   = ewmhDesktopsEventHook <+> fullscreenEventHook 
+        , startupHook       = startupHook conf <+> setWMName "LG3D" -- Java app focus fix
+        , logHook           = ewmhDesktopsLogHook
+        , borderWidth       = 1
+        , focusedBorderColor= "#dd0000"
+        , normalBorderColor = "#444444"
+        , workspaces        = myWorkspaces
+        , modMask           = mod4Mask
+        , keys              = myKeys
+        , focusFollowsMouse = True
+        , terminal          = "qterminal"
+        }
+
+main :: IO ()
+main = xmonad conf
