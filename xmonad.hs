@@ -10,6 +10,8 @@
 import XMonad
 import XMonad.Config.Xfce
 
+import XMonad.Actions.ShowText (handleTimerEvent)
+
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks (avoidStruts, manageDocks)
 import XMonad.Hooks.SetWMName (setWMName)
@@ -26,7 +28,9 @@ main =
                                             <+> manageDocks
                                             <+> manageHook xfceConfig
         , layoutHook         = avoidStruts (myLayoutHook)
-        , handleEventHook    = ewmhDesktopsEventHook <+> fullscreenEventHook 
+        , handleEventHook    = ewmhDesktopsEventHook
+                               <+> fullscreenEventHook
+                               <+> handleTimerEvent
         , logHook            = ewmhDesktopsLogHook
         , borderWidth        = 2
         , focusedBorderColor = "#990000"
