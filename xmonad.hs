@@ -8,12 +8,12 @@
 -------------------------------------------------------------------------------
 
 import XMonad
-import XMonad.Config.Xfce
+import XMonad.Config.Xfce (desktopLayoutModifiers, xfceConfig)
 
 import XMonad.Actions.ShowText (handleTimerEvent)
 
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.ManageDocks (avoidStruts, manageDocks)
+import XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
+import XMonad.Hooks.ManageDocks (manageDocks)
 import XMonad.Hooks.SetWMName (setWMName)
 
 import Keys (myKeys)
@@ -23,25 +23,46 @@ import Managers (pbManageHook, myManageHook)
 main :: IO ()
 main = 
   let
-      conf = ewmh xfceConfig
-        { manageHook         = pbManageHook <+> myManageHook
-                                            <+> manageDocks
-                                            <+> manageHook xfceConfig
-        , layoutHook         = avoidStruts (myLayoutHook)
-        , handleEventHook    = ewmhDesktopsEventHook
+      conf = xfceConfig
+        { borderWidth        = 2
+        , clickJustFocuses   = False
+        , clientMask         = clientMask xfceConfig
+        , focusFollowsMouse  = True
+        , focusedBorderColor = "#990000"
+
+        , handleEventHook    = handleEventHook xfceConfig
                                <+> fullscreenEventHook
                                <+> handleTimerEvent
-        , logHook            = ewmhDesktopsLogHook
-        , borderWidth        = 2
-        , focusedBorderColor = "#990000"
-        , normalBorderColor  = "#444444"
-        , workspaces         = ["main","mail","work","chat","5","6","7","games","music"]
-        , modMask            = mod4Mask
+
+        , handleExtraArgs    = handleExtraArgs xfceConfig
         , keys               = myKeys
-        , focusFollowsMouse  = True
+        , layoutHook         = desktopLayoutModifiers $ myLayoutHook
+        , logHook            = logHook xfceConfig
+
+        , manageHook         = pbManageHook
+                               <+> myManageHook
+                               <+> manageDocks
+                               <+> manageHook xfceConfig
+
+        , modMask            = mod4Mask
+        , mouseBindings      = mouseBindings xfceConfig
+        , normalBorderColor  = "#444444"
+        , rootMask           = rootMask xfceConfig
+        , startupHook        = startupHook xfceConfig
         , terminal           = "qterminal"
+
+        , workspaces         = [ "main"
+                               , "mail"
+                               , "chat"
+                               , "work-1"
+                               , "work-2"
+                               , "work-3"
+                               , "work-4"
+                               , "games"
+                               , "music"
+                               ]
         }
    in
-    xmonad $ conf
-      { startupHook       = startupHook conf >> setWMName "LG3D" -- Java app focus fix
+    xmonad $ ewmh conf
+      { startupHook          = startupHook conf >> setWMName "LG3D" -- Java app focus fix
       }
