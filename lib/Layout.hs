@@ -3,7 +3,7 @@ module Layout (myLayoutHook) where
 import XMonad.Layout
 import XMonad.Layout.ComboP
 import XMonad.Layout.Grid
-import XMonad.Layout.Named
+import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Reflect
 import XMonad.Layout.ResizableTile
@@ -11,9 +11,9 @@ import XMonad.Layout.Spacing
 import XMonad.Layout.Tabbed
 import XMonad.Layout.TwoPane
 
-myLayoutHook = tile ||| rtile ||| full ||| mtile ||| gimp
+myLayoutHook = tile ||| rtile ||| full ||| mtile ||| tab ||| gimp
   where
-    rt      = smartSpacingWithEdge 5 $ ResizableTall 1 (2/100) (1/2) []
+    rt      = smartSpacingWithEdge 4 $ ResizableTall 1 (2/100) (8/13) []
     -- normal vertical tile
     tile    = named "[]="   $ smartBorders rt
     rtile   = named "=[]"   $ reflectHoriz $ smartBorders rt
@@ -26,7 +26,7 @@ myLayoutHook = tile ||| rtile ||| full ||| mtile ||| gimp
     tabtile = named "TT"    $ combineTwoP (TwoPane 0.03 0.5)
                                           (tabB)
                                           (tabB)
-                                          (ClassName "firefox")
+                                          (ClassName "Firefox" `Or` ClassName "Google-chrome")
     -- two layouts for gimp, tabs and tiling
     gimp    = named "gimp"  $ combineTwoP (TwoPane 0.03 0.15)
                                           (tabB) (reflectHoriz
@@ -36,7 +36,10 @@ myLayoutHook = tile ||| rtile ||| full ||| mtile ||| gimp
                                                  )
                                           (Role "gimp-toolbox")
     -- fullscreen without tabs
-    full        = named "[]"    $ noBorders Full
+    full    = named "[]"    $ noBorders Full
+
+    -- make renamed work more like named, which is now deprecated
+    named t = renamed [Replace t]
 
 tabTheme = def
     { activeColor           = "white"

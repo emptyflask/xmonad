@@ -10,11 +10,15 @@
 import XMonad
 import XMonad.Config.Xfce (desktopLayoutModifiers, xfceConfig)
 
+import XMonad.Actions.GroupNavigation (historyHook)
 import XMonad.Actions.ShowText (handleTimerEvent)
 
 import XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks (manageDocks)
 import XMonad.Hooks.SetWMName (setWMName)
+import XMonad.Layout.ShowWName
+
+-- import System.Taffybar.Hooks.PagerHints (pagerHints)
 
 import Keys (myKeys)
 import Layout (myLayoutHook)
@@ -36,19 +40,23 @@ main =
 
         , handleExtraArgs    = handleExtraArgs xfceConfig
         , keys               = myKeys
-        , layoutHook         = desktopLayoutModifiers $ myLayoutHook
+        , layoutHook         = desktopLayoutModifiers myLayoutHook
         , logHook            = logHook xfceConfig
+                               <+> historyHook
 
-        , manageHook         = pbManageHook
+        , manageHook         = manageHook xfceConfig
                                <+> myManageHook
                                <+> manageDocks
-                               <+> manageHook xfceConfig
+                               <+> pbManageHook
 
         , modMask            = mod4Mask
         , mouseBindings      = mouseBindings xfceConfig
         , normalBorderColor  = "#444444"
         , rootMask           = rootMask xfceConfig
+
         , startupHook        = startupHook xfceConfig
+                               >> setWMName "LG3D" -- Java app focus fix
+
         , terminal           = "qterminal"
 
         , workspaces         = [ "main"
@@ -64,5 +72,3 @@ main =
         }
    in
     xmonad $ ewmh conf
-      { startupHook          = startupHook conf >> setWMName "LG3D" -- Java app focus fix
-      }

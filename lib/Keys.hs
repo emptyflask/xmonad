@@ -4,9 +4,11 @@ import XMonad
 import qualified Data.Map as M
 import qualified XMonad.StackSet as W
 
+import qualified XMonad.Actions.GroupNavigation as GN
 import qualified XMonad.Actions.Search as Search
-import qualified XMonad.Actions.ShowText as ST
+import qualified XMonad.Actions.ShowText as T
 import qualified XMonad.Actions.Submap as Submap
+import XMonad.Actions.WithAll (sinkAll)
 import XMonad.Actions.CycleWS
 
 import XMonad.Hooks.ManageDocks
@@ -31,23 +33,26 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- layouts
     , ((modMask,                xK_space    ), sendMessage NextLayout)
-    , ((modMask .|. shiftMask,  xK_space    ), setLayout $ XMonad.layoutHook conf)
+    , ((modMask .|. shiftMask,  xK_space    ), flash "Reset Layout" >> (setLayout $ XMonad.layoutHook conf))
 
     -- floating layer stuff
     , ((modMask,                xK_t        ), withFocused $ windows . W.sink)
+    , ((modMask .|. shiftMask,  xK_t        ), sinkAll)
 
     -- refresh
-    , ((modMask .|. shiftMask,  xK_r        ), refresh)
+    , ((modMask,                xK_F5       ), flash "Refresh" >> refresh)
 
     -- focus
-    , ((modMask,                xK_Tab      ), windows W.focusDown)
+    , ((mod1Mask,               xK_Tab      ), GN.nextMatch GN.History (return True))
+    , ((modMask,                xK_Tab      ), moveTo Next NonEmptyWS)
+    , ((modMask .|. shiftMask,  xK_Tab      ), moveTo Prev NonEmptyWS)
     , ((modMask,                xK_j        ), windows W.focusDown)
     , ((modMask,                xK_k        ), windows W.focusUp)
     , ((modMask,                xK_m        ), windows W.focusMaster)
     , ((modMask,                xK_Right    ), flash "->" >> nextWS)
     , ((modMask,                xK_Left     ), flash "<-" >> prevWS)
-    , ((modMask .|. shiftMask,  xK_Right    ), shiftToNext >> nextWS)
-    , ((modMask .|. shiftMask,  xK_Left     ), shiftToPrev >> prevWS)
+    , ((modMask .|. shiftMask,  xK_Right    ), flash "Move ->" >> shiftToNext >> nextWS)
+    , ((modMask .|. shiftMask,  xK_Left     ), flash "<- Move" >> shiftToPrev >> prevWS)
 
     -- swapping
     , ((modMask .|. shiftMask,  xK_Return   ), windows W.swapMaster)
@@ -79,8 +84,12 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- ungrab mouse cursor from applications which can grab it
     , ((modMask,                xK_i        ), spawn "xdotool key XF86Ungrab")
 
+    -- open man pages / ssh consoles
     , ((modMask,                xK_F1       ), manPrompt Prompt.def)
     , ((modMask,                xK_F2       ), sshPrompt Prompt.def)
+
+    -- open rofi
+    , ((mod1Mask,               xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
 
     ] ++ workspaceKeys ++ screenKeys
 
@@ -106,7 +115,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     flash :: String -> X ()
     flash text =
-      ST.flashText def 1 text
+      T.flashText def 1 $ " " ++ text ++ " "
 
     -- mod-[1..9]       Switch to workspace N
     -- mod-shift-[1..9] Move client to workspace N
