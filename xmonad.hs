@@ -40,7 +40,7 @@ main =
 
         , handleExtraArgs    = handleExtraArgs xfceConfig
         , keys               = myKeys
-        , layoutHook         = desktopLayoutModifiers myLayoutHook
+        , layoutHook         = desktopLayoutModifiers $ showWName myLayoutHook
         , logHook            = logHook xfceConfig
                                <+> historyHook
 
@@ -59,15 +59,15 @@ main =
 
         , terminal           = "qterminal"
 
-        , workspaces         = [ "main"
-                               , "mail"
-                               , "chat"
-                               , "work-1"
-                               , "work-2"
-                               , "work-3"
-                               , "work-4"
-                               , "games"
-                               , "music"
+        , workspaces         = [ "1: Main"
+                               , "2: Mail"
+                               , "3: Chat"
+                               , "4: Work-1"
+                               , "5: Work-2"
+                               , "6: Work-3"
+                               , "7: Work-4"
+                               , "8: Games"
+                               , "9: Music"
                                ]
         }
    in

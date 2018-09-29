@@ -24,76 +24,81 @@ import XMonad.Prompt.Ssh
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- launching and killing programs
-    [ ((modMask,                xK_Return   ), spawn "qterminal")
-    , ((modMask,                xK_o        ), spawn "xfrun4")
-    , ((modMask,                xK_f        ), spawn "pcmanfm")
-    , ((modMask .|. shiftMask,  xK_c        ), spawn "xkill")
-    , ((modMask,                xK_c        ), kill)
-    , ((modMask,                xK_b        ), sendMessage ToggleStruts)
+    [ ((mod,                xK_Return   ), spawn "qterminal")
+    , ((mod,                xK_o        ), spawn "xfrun4")
+    , ((mod,                xK_f        ), spawn "pcmanfm")
+    , ((mod .|. shift,      xK_c        ), kill)
+    , ((mod,                xK_b        ), sendMessage ToggleStruts)
 
     -- layouts
-    , ((modMask,                xK_space    ), sendMessage NextLayout)
-    , ((modMask .|. shiftMask,  xK_space    ), flash "Reset Layout" >> (setLayout $ XMonad.layoutHook conf))
+    , ((mod,                xK_space    ), sendMessage NextLayout)
+    , ((mod .|. shift,      xK_space    ), flash "Reset Layout" >> setLayout (XMonad.layoutHook conf))
 
     -- floating layer stuff
-    , ((modMask,                xK_t        ), withFocused $ windows . W.sink)
-    , ((modMask .|. shiftMask,  xK_t        ), sinkAll)
+    , ((mod,                xK_t        ), withFocused $ windows . W.sink)
+    , ((mod .|. shift,      xK_t        ), sinkAll)
 
     -- refresh
-    , ((modMask,                xK_F5       ), flash "Refresh" >> refresh)
+    , ((mod,                xK_F5       ), flash "Refresh" >> refresh)
 
     -- focus
-    , ((mod1Mask,               xK_Tab      ), GN.nextMatch GN.History (return True))
-    , ((modMask,                xK_Tab      ), moveTo Next NonEmptyWS)
-    , ((modMask .|. shiftMask,  xK_Tab      ), moveTo Prev NonEmptyWS)
-    , ((modMask,                xK_j        ), windows W.focusDown)
-    , ((modMask,                xK_k        ), windows W.focusUp)
-    , ((modMask,                xK_m        ), windows W.focusMaster)
-    , ((modMask,                xK_Right    ), flash "->" >> nextWS)
-    , ((modMask,                xK_Left     ), flash "<-" >> prevWS)
-    , ((modMask .|. shiftMask,  xK_Right    ), flash "Move ->" >> shiftToNext >> nextWS)
-    , ((modMask .|. shiftMask,  xK_Left     ), flash "<- Move" >> shiftToPrev >> prevWS)
+    , ((alt,                xK_Tab      ), GN.nextMatch GN.History (return True))
+    , ((mod,                xK_Tab      ), moveTo Next NonEmptyWS)
+    , ((mod .|. shift,      xK_Tab      ), moveTo Prev NonEmptyWS)
+    , ((mod,                xK_j        ), windows W.focusDown)
+    , ((mod,                xK_k        ), windows W.focusUp)
+    , ((mod,                xK_m        ), windows W.focusMaster)
+    , ((mod,                xK_Right    ), flash "->" >> nextWS)
+    , ((mod,                xK_Left     ), flash "<-" >> prevWS)
+    , ((mod .|. shift,      xK_Right    ), flash "Move ->" >> shiftToNext >> nextWS)
+    , ((mod .|. shift,      xK_Left     ), flash "<- Move" >> shiftToPrev >> prevWS)
 
     -- swapping
-    , ((modMask .|. shiftMask,  xK_Return   ), windows W.swapMaster)
-    , ((modMask .|. shiftMask,  xK_j        ), windows W.swapDown)
-    , ((modMask .|. shiftMask,  xK_k        ), windows W.swapUp)
-    -- , ((modMask,                xK_s        ), sendMessage $ SwapWindow)
+    , ((mod .|. shift,      xK_Return   ), windows W.swapMaster)
+    , ((mod .|. shift,      xK_j        ), windows W.swapDown)
+    , ((mod .|. shift,      xK_k        ), windows W.swapUp)
+    -- , ((mod,                xK_s        ), sendMessage $ SwapWindow)
 
     -- increase or decrease number of windows in the master area
-    , ((modMask,                xK_comma    ), sendMessage (IncMasterN 1))
-    , ((modMask,                xK_period   ), sendMessage (IncMasterN (-1)))
+    , ((mod,                xK_comma    ), sendMessage (IncMasterN 1))
+    , ((mod,                xK_period   ), sendMessage (IncMasterN (-1)))
 
     -- resizing
-    , ((modMask,                xK_h        ), sendMessage Shrink)
-    , ((modMask,                xK_l        ), sendMessage Expand)
-    , ((modMask .|. shiftMask,  xK_h        ), sendMessage MirrorShrink)
-    , ((modMask .|. shiftMask,  xK_l        ), sendMessage MirrorExpand)
+    , ((mod,                xK_h        ), sendMessage Shrink)
+    , ((mod,                xK_l        ), sendMessage Expand)
+    , ((mod .|. shift,      xK_h        ), sendMessage MirrorShrink)
+    , ((mod .|. shift,      xK_l        ), sendMessage MirrorExpand)
 
     -- search (mod-s [g,h,w,y])
-    , ((modMask,                xK_s        ), promptSearch)
-    , ((modMask .|. shiftMask,  xK_s        ), selectSearch)
+    , ((mod,                xK_s        ), promptSearch)
+    , ((mod .|. shift,      xK_s        ), selectSearch)
 
     -- quit, or restart
-    , ((modMask  .|. shiftMask, xK_q        ), spawn "xfce4-session-logout")
-    , ((mod1Mask .|. shiftMask, xK_q        ), spawn "i3lock-fancy")
+    , ((mod .|. shift,      xK_q        ), spawn "xfce4-session-logout")
+    , ((alt .|. shift,      xK_q        ), spawn "i3lock-fancy")
 
     -- Restart xmonad
-    , ((modMask,                xK_q        ), restart "xmonad" True)
+    , ((mod,                xK_q        ), restart "xmonad" True)
 
     -- ungrab mouse cursor from applications which can grab it
-    , ((modMask,                xK_i        ), spawn "xdotool key XF86Ungrab")
+    , ((mod,                xK_i        ), spawn "xdotool key XF86Ungrab")
 
     -- open man pages / ssh consoles
-    , ((modMask,                xK_F1       ), manPrompt Prompt.def)
-    , ((modMask,                xK_F2       ), sshPrompt Prompt.def)
+    , ((mod,                xK_F1       ), manPrompt Prompt.def)
+    , ((mod,                xK_F2       ), sshPrompt Prompt.def)
 
     -- open rofi
-    , ((mod1Mask,               xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
+    , ((alt,                xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
+    , ((ctrl .|. alt,       xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
 
     ] ++ workspaceKeys ++ screenKeys
 
  where
+    mod   = modMask
+    ctrl  = controlMask
+    alt   = mod1Mask
+    shift = shiftMask
+
     promptSearch :: X ()
     promptSearch = do flash "Search ?"
                       Submap.submap . searchEngineMap $ Search.promptSearch Prompt.def
@@ -115,16 +120,24 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     flash :: String -> X ()
     flash text =
-      T.flashText def 1 $ " " ++ text ++ " "
+      T.flashText def 1 (" " ++ text ++ " ")
 
     -- mod-[1..9]       Switch to workspace N
     -- mod-shift-[1..9] Move client to workspace N
     workspaceKeys :: [((KeyMask, KeySym), X ())]
     workspaceKeys =
       [ ((m .|. modMask, k), windows $ f i)
-        | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
+        | (i, k) <- zip (cycle $ XMonad.workspaces conf) $ numKeys ++ numpadKeys
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
       ]
+
+    numKeys :: [KeySym]
+    numKeys = [xK_1 .. xK_9]
+
+    numpadKeys :: [KeySym]
+    numpadKeys = [xK_KP_End,  xK_KP_Down,  xK_KP_Page_Down, 
+                  xK_KP_Left, xK_KP_Begin, xK_KP_Right, 
+                  xK_KP_Home, xK_KP_Up,    xK_KP_Page_Up]
 
     -- mod-{w,e,r}       Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r} Move client to screen 1, 2, or 3
