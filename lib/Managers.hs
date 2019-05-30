@@ -46,6 +46,7 @@ myManageHook = composeAll [ matchAny v --> a | (v,a) <- myActions]
             [ ("Xfrun4"                         , doFloat)
             , ("Xfce4-notifyd"                  , doIgnore)
             , ("Xfce4-appfinder"                , doFloat)
+            , ("rofi"                           , doIgnore)
             , ("MPlayer"                        , doFloat)
             , ("mpv"                            , doFloat)
             , ("Oracle VM VirtualBox Manager"   , doShift "8")
@@ -95,5 +96,6 @@ myManageHook = composeAll [ matchAny v --> a | (v,a) <- myActions]
 -- avoidMaster:  Avoid the master window, but otherwise manage new windows normally
 avoidMaster :: W.StackSet i l a s sd -> W.StackSet i l a s sd
 avoidMaster = W.modify' $ \c -> case c of
-    W.Stack t [] (r:rs) -> W.Stack t [r] rs
+    -- W.Stack t [] (r:rs) -> W.Stack t [r] rs
+    W.Stack t [] (r:rs) -> W.Stack r [] (t:rs)
     otherwise           -> c

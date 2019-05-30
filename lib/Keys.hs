@@ -15,22 +15,30 @@ import XMonad.Hooks.ManageDocks
 
 import XMonad.Layout.ComboP (SwapWindow(..))
 import XMonad.Layout.ResizableTile (MirrorResize(..))
+import XMonad.Layout.Spacing
 
 import qualified XMonad.Prompt as Prompt
 import XMonad.Prompt.Man
 import XMonad.Prompt.Ssh
 
+import Graphics.X11.ExtraTypes.XF86
+import System.Exit
+
 -- Keyboard --
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- launching and killing programs
-    [ ((mod,                xK_Return   ), spawn "qterminal")
+    [ ((mod,                xK_Return   ), spawn "kitty")
     , ((mod,                xK_o        ), spawn "xfrun4")
     , ((mod,                xK_f        ), spawn "pcmanfm")
     , ((mod .|. shift,      xK_c        ), kill)
-    , ((mod,                xK_b        ), sendMessage ToggleStruts)
 
     -- layouts
+    , ((mod,                xK_b        ), sendMessage ToggleStruts)
+    , ((mod,                xK_equal    ), incScreenWindowSpacing 2)
+    , ((mod .|. shift,      xK_equal    ), setScreenWindowSpacing 20)
+    , ((mod,                xK_minus    ), decScreenWindowSpacing 2)
+    , ((mod .|. shift,      xK_minus    ), setScreenWindowSpacing 0)
     , ((mod,                xK_space    ), sendMessage NextLayout)
     , ((mod .|. shift,      xK_space    ), flash "Reset Layout" >> setLayout (XMonad.layoutHook conf))
 
@@ -74,8 +82,9 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((mod .|. shift,      xK_s        ), selectSearch)
 
     -- quit, or restart
-    , ((mod .|. shift,      xK_q        ), spawn "xfce4-session-logout")
-    , ((alt .|. shift,      xK_q        ), spawn "i3lock-fancy")
+    -- , ((mod .|. shift,      xK_q        ), spawn "xfce4-session-logout")
+    , ((mod .|. shift,      xK_q        ), io (exitWith ExitSuccess)) -- %! Quit xmonad
+    , ((mod .|. alt,        xK_l        ), spawn "xautolock -locknow")
 
     -- Restart xmonad
     , ((mod,                xK_q        ), restart "xmonad" True)
@@ -91,7 +100,9 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((alt,                xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
     , ((ctrl .|. alt,       xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
 
-    ] ++ workspaceKeys ++ screenKeys
+    , ((mod .|. shift,      xK_slash    ), helpCommand) -- %! Run xmessage with a summary of the default keybindings (useful for beginners)
+
+    ] ++ workspaceKeys ++ screenKeys ++ mediaKeys
 
  where
     mod   = modMask
@@ -130,14 +141,11 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
         | (i, k) <- zip (cycle $ XMonad.workspaces conf) $ numKeys ++ numpadKeys
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
       ]
-
-    numKeys :: [KeySym]
-    numKeys = [xK_1 .. xK_9]
-
-    numpadKeys :: [KeySym]
-    numpadKeys = [xK_KP_End,  xK_KP_Down,  xK_KP_Page_Down, 
-                  xK_KP_Left, xK_KP_Begin, xK_KP_Right, 
-                  xK_KP_Home, xK_KP_Up,    xK_KP_Page_Up]
+        where
+          numKeys    = [xK_1 .. xK_9]
+          numpadKeys = [xK_KP_End,  xK_KP_Down,  xK_KP_Page_Down,
+                        xK_KP_Left, xK_KP_Begin, xK_KP_Right,
+                        xK_KP_Home, xK_KP_Up,    xK_KP_Page_Up]
 
     -- mod-{w,e,r}       Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r} Move client to screen 1, 2, or 3
@@ -147,3 +155,63 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
         | (key, sc) <- zip [xK_e, xK_w, xK_r] [0..]
         , (f, m)    <- [(W.view, 0), (W.shift, shiftMask)]
       ]
+
+    mediaKeys :: [((KeyMask, KeySym), X ())]
+    mediaKeys =
+      [ ((0 , xF86XK_AudioRaiseVolume), spawn "pactl set-sink-volume @DEFAULT_SINK@ +2%")
+      , ((0 , xF86XK_AudioLowerVolume), spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
+      , ((0 , xF86XK_AudioMute),        spawn "pactl set-sink-mute   @DEFAULT_SINK@ toggle")
+      ]
+
+    helpCommand :: X ()
+    helpCommand = spawn ("echo \"" ++ help ++ "\" | xmessage -file -")
+
+help :: String
+help = unlines ["The modifier key is 'alt'. Default keybindings:",
+    "",
+    "-- launching and killing programs",
+    "mod-Shift-Enter  Launch xterminal",
+    "mod-p            Launch dmenu",
+    "mod-Shift-p      Launch gmrun",
+    "mod-Shift-c      Close/kill the focused window",
+    "mod-Space        Rotate through the available layout algorithms",
+    "mod-Shift-Space  Reset the layouts on the current workSpace to default",
+    "mod-n            Resize/refresh viewed windows to the correct size",
+    "",
+    "-- move focus up or down the window stack",
+    "mod-Tab        Move focus to the next window",
+    "mod-Shift-Tab  Move focus to the previous window",
+    "mod-j          Move focus to the next window",
+    "mod-k          Move focus to the previous window",
+    "mod-m          Move focus to the master window",
+    "",
+    "-- modifying the window order",
+    "mod-Return   Swap the focused window and the master window",
+    "mod-Shift-j  Swap the focused window with the next window",
+    "mod-Shift-k  Swap the focused window with the previous window",
+    "",
+    "-- resizing the master/slave ratio",
+    "mod-h  Shrink the master area",
+    "mod-l  Expand the master area",
+    "",
+    "-- floating layer support",
+    "mod-t  Push window back into tiling; unfloat and re-tile it",
+    "",
+    "-- increase or decrease number of windows in the master area",
+    "mod-comma  (mod-,)   Increment the number of windows in the master area",
+    "mod-period (mod-.)   Deincrement the number of windows in the master area",
+    "",
+    "-- quit, or restart",
+    "mod-Shift-q  Quit xmonad",
+    "mod-q        Restart xmonad",
+    "",
+    "-- Workspaces & screens",
+    "mod-[1..9]         Switch to workSpace N",
+    "mod-Shift-[1..9]   Move client to workspace N",
+    "mod-{w,e,r}        Switch to physical/Xinerama screens 1, 2, or 3",
+    "mod-Shift-{w,e,r}  Move client to screen 1, 2, or 3",
+    "",
+    "-- Mouse bindings: default actions bound to mouse events",
+    "mod-button1  Set the window to floating mode and move by dragging",
+    "mod-button2  Raise the window to the top of the stack",
+    "mod-button3  Set the window to floating mode and resize by dragging"]

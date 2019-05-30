@@ -11,7 +11,7 @@ import XMonad.Layout.Spacing
 import XMonad.Layout.Tabbed
 import XMonad.Layout.TwoPane
 
-myLayoutHook = tile ||| rtile ||| full ||| mtile ||| tab ||| gimp
+myLayoutHook = tile ||| rtile ||| mtile ||| full ||| tab
   where
     rt      = smartSpacingWithEdge 4 $ ResizableTall 1 (2/100) (8/13) []
     -- normal vertical tile

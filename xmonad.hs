@@ -31,7 +31,7 @@ main =
         { borderWidth        = 2
         , clickJustFocuses   = False
         , clientMask         = clientMask xfceConfig
-        , focusFollowsMouse  = True
+        , focusFollowsMouse  = False
         , focusedBorderColor = "#990000"
 
         , handleEventHook    = handleEventHook xfceConfig
@@ -55,9 +55,9 @@ main =
         , rootMask           = rootMask xfceConfig
 
         , startupHook        = startupHook xfceConfig
-                               >> setWMName "LG3D" -- Java app focus fix
+                               -- >> setWMName "LG3D" -- Java app focus fix
 
-        , terminal           = "qterminal"
+        , terminal           = "kitty"
 
         , workspaces         = [ "1: Main"
                                , "2: Mail"
