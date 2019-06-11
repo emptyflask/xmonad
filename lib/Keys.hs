@@ -5,6 +5,7 @@ import qualified Data.Map as M
 import qualified XMonad.StackSet as W
 
 import qualified XMonad.Actions.GroupNavigation as GN
+import qualified XMonad.Actions.Navigation2D as N2D
 import qualified XMonad.Actions.Search as Search
 import qualified XMonad.Actions.ShowText as T
 import qualified XMonad.Actions.Submap as Submap
@@ -35,10 +36,10 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- layouts
     , ((mod,                xK_b        ), sendMessage ToggleStruts)
-    , ((mod,                xK_equal    ), incScreenWindowSpacing 2)
-    , ((mod .|. shift,      xK_equal    ), setScreenWindowSpacing 20)
-    , ((mod,                xK_minus    ), decScreenWindowSpacing 2)
-    , ((mod .|. shift,      xK_minus    ), setScreenWindowSpacing 0)
+    , ((mod,                xK_equal    ), decScreenWindowSpacing 2)
+    , ((mod .|. shift,      xK_equal    ), setScreenWindowSpacing 0)
+    , ((mod,                xK_minus    ), incScreenWindowSpacing 2)
+    , ((mod .|. shift,      xK_minus    ), setScreenWindowSpacing 20)
     , ((mod,                xK_space    ), sendMessage NextLayout)
     , ((mod .|. shift,      xK_space    ), flash "Reset Layout" >> setLayout (XMonad.layoutHook conf))
 
@@ -60,6 +61,12 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((mod,                xK_Left     ), flash "<-" >> prevWS)
     , ((mod .|. shift,      xK_Right    ), flash "Move ->" >> shiftToNext >> nextWS)
     , ((mod .|. shift,      xK_Left     ), flash "<- Move" >> shiftToPrev >> prevWS)
+
+    -- Directional navigation of windows
+    , ((mod .|. alt,        xK_Right    ), N2D.windowGo R False)
+    , ((mod .|. alt,        xK_Left     ), N2D.windowGo L False)
+    , ((mod .|. alt,        xK_Up       ), N2D.windowGo U False)
+    , ((mod .|. alt,        xK_Down     ), N2D.windowGo D False)
 
     -- swapping
     , ((mod .|. shift,      xK_Return   ), windows W.swapMaster)
@@ -84,7 +91,8 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- quit, or restart
     -- , ((mod .|. shift,      xK_q        ), spawn "xfce4-session-logout")
     , ((mod .|. shift,      xK_q        ), io (exitWith ExitSuccess)) -- %! Quit xmonad
-    , ((mod .|. alt,        xK_l        ), spawn "xautolock -locknow")
+    , ((mod .|. shift,      xK_l        ), spawn "systemctl suspend")
+    -- , ((mod .|. alt,        xK_l        ), spawn "xautolock -locknow")
 
     -- Restart xmonad
     , ((mod,                xK_q        ), restart "xmonad" True)
