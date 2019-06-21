@@ -1,0 +1,46 @@
+module Workspaces where
+
+import qualified Data.Map.Strict as M
+
+data Workspace = Workspace
+  { name :: String
+  , glyph :: String
+  } deriving (Show)
+
+workspaces :: [Workspace]
+workspaces =
+  [ Workspace "Main"   "\xf120"
+  , Workspace "Mail"   "\xf0e0"
+  , Workspace "Chat"   "\xf0eb"
+  , Workspace "Work-1" "\xf121"
+  , Workspace "Work-2" "\xf121"
+  , Workspace "Work-3" "\xf121"
+  , Workspace "Work-4" "\xf121"
+  , Workspace "Games"  "\xf11b"
+  , Workspace "Music"  "\xf001"
+  ]
+
+numbered :: [String]
+numbered = map show [1 .. (length workspaces)]
+
+indexedWorkspaces :: M.Map Int Workspace
+indexedWorkspaces = withIndex workspaces
+
+-- ["a", "b"] -> Map.fromList [(1,"a"), (2,"b")]
+withIndex :: (Ord k, Num k, Enum k) => [a] -> M.Map k a
+withIndex = M.fromList . zip [1..]
+
+lookup :: Int -> Maybe Workspace
+lookup n = M.lookup n $ withIndex workspaces
+
+-- toString :: Int -> String
+-- toString current = unwords . M.elems $ M.mapWithKey fmt indexedWorkspaces
+--   where
+--     fmt current ws = "%{B#2c3e50}%{u#6e98a4} " ++ glyph ws ++ " %{B-}%{-u}"
+--     fmt _ ws = " " ++ glyph ws ++ " "
+
+names :: [Workspace] -> [String]
+names = map name
+
+glyphs :: [Workspace] -> [String]
+glyphs = map glyph

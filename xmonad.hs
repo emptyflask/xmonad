@@ -8,7 +8,7 @@ import XMonad.Actions.ShowText (handleTimerEvent)
 import XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks (manageDocks)
 import XMonad.Hooks.UrgencyHook (withUrgencyHook, NoUrgencyHook(..))
-import XMonad.Hooks.SetWMName (setWMName)
+-- import XMonad.Hooks.SetWMName (setWMName)
 import XMonad.Layout.ShowWName
 
 import XMonad.Util.Run (safeSpawn)
@@ -18,7 +18,8 @@ import XMonad.Util.Run (safeSpawn)
 import Keys (myKeys)
 import Layout (myLayoutHook)
 import Managers (pbManageHook, myManageHook)
-import Logging (eventLogHook, myWorkspaces)
+import Logging (eventLogHook)
+import qualified Workspaces
 
 main :: IO ()
 main = 
@@ -65,14 +66,5 @@ main =
 
         , terminal           = "kitty"
 
-        , workspaces         = [ "1: Main"
-                              , "2: Mail"
-                              , "3: Chat"
-                              , "4: Work-1"
-                              , "5: Work-2"
-                              , "6: Work-3"
-                              , "7: Work-4"
-                              , "8: Games"
-                              , "9: Music"
-                              ]
+        , workspaces         = Workspaces.numbered
         }

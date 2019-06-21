@@ -98,4 +98,4 @@ avoidMaster :: W.StackSet i l a s sd -> W.StackSet i l a s sd
 avoidMaster = W.modify' $ \c -> case c of
     -- W.Stack t [] (r:rs) -> W.Stack t [r] rs
     W.Stack t [] (r:rs) -> W.Stack r [] (t:rs)
-    otherwise           -> c
+    _ -> c

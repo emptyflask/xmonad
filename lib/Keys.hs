@@ -14,7 +14,7 @@ import XMonad.Actions.CycleWS
 
 import XMonad.Hooks.ManageDocks
 
-import XMonad.Layout.ComboP (SwapWindow(..))
+-- import XMonad.Layout.ComboP (SwapWindow(..))
 import XMonad.Layout.ResizableTile (MirrorResize(..))
 import XMonad.Layout.Spacing
 
@@ -27,93 +27,99 @@ import System.Exit
 
 -- Keyboard --
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
-myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
+myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     -- launching and killing programs
-    [ ((mod,                xK_Return   ), spawn "kitty")
-    , ((mod,                xK_o        ), spawn "xfrun4")
-    , ((mod,                xK_f        ), spawn "pcmanfm")
-    , ((mod .|. shift,      xK_c        ), kill)
+    [ ((modm,                xK_Return   ), spawn "kitty")
+    , ((modm,                xK_o        ), spawn "xfrun4")
+    , ((modm,                xK_f        ), spawn "pcmanfm")
+    , ((modm .|. shift,      xK_c        ), kill)
 
     -- layouts
-    , ((mod,                xK_b        ), sendMessage ToggleStruts)
-    , ((mod,                xK_equal    ), decScreenWindowSpacing 2)
-    , ((mod .|. shift,      xK_equal    ), setScreenWindowSpacing 0)
-    , ((mod,                xK_minus    ), incScreenWindowSpacing 2)
-    , ((mod .|. shift,      xK_minus    ), setScreenWindowSpacing 20)
-    , ((mod,                xK_space    ), sendMessage NextLayout)
-    , ((mod .|. shift,      xK_space    ), flash "Reset Layout" >> setLayout (XMonad.layoutHook conf))
+    , ((modm,                xK_b        ), sendMessage ToggleStruts)
+    , ((modm,                xK_equal    ), decScreenWindowSpacing 2)
+    , ((modm .|. shift,      xK_equal    ), setScreenWindowSpacing 0)
+    , ((modm,                xK_minus    ), incScreenWindowSpacing 2)
+    , ((modm .|. shift,      xK_minus    ), setScreenWindowSpacing 20)
+    , ((modm,                xK_space    ), sendMessage NextLayout)
+    , ((modm .|. shift,      xK_space    ), flash "Reset Layout" >> setLayout (XMonad.layoutHook conf))
 
     -- floating layer stuff
-    , ((mod,                xK_t        ), withFocused $ windows . W.sink)
-    , ((mod .|. shift,      xK_t        ), sinkAll)
+    , ((modm,                xK_t        ), withFocused $ windows . W.sink)
+    , ((modm .|. shift,      xK_t        ), sinkAll)
 
     -- refresh
-    , ((mod,                xK_F5       ), flash "Refresh" >> refresh)
+    , ((modm,                xK_F5       ), flash "Refresh" >> refresh)
 
     -- focus
-    , ((alt,                xK_Tab      ), GN.nextMatch GN.History (return True))
-    , ((mod,                xK_Tab      ), moveTo Next NonEmptyWS)
-    , ((mod .|. shift,      xK_Tab      ), moveTo Prev NonEmptyWS)
-    , ((mod,                xK_j        ), windows W.focusDown)
-    , ((mod,                xK_k        ), windows W.focusUp)
-    , ((mod,                xK_m        ), windows W.focusMaster)
-    , ((mod,                xK_Right    ), flash "->" >> nextWS)
-    , ((mod,                xK_Left     ), flash "<-" >> prevWS)
-    , ((mod .|. shift,      xK_Right    ), flash "Move ->" >> shiftToNext >> nextWS)
-    , ((mod .|. shift,      xK_Left     ), flash "<- Move" >> shiftToPrev >> prevWS)
+    , ((alt,           xK_Tab      ), GN.nextMatch GN.History (return True))
+    , ((modm,           xK_Tab      ), moveTo Next NonEmptyWS)
+    , ((modm .|. shift, xK_Tab      ), moveTo Prev NonEmptyWS)
+    , ((modm,           xK_j        ), windows W.focusDown)
+    , ((modm,           xK_k        ), windows W.focusUp)
+    , ((modm,           xK_Down     ), windows W.focusDown)
+    , ((modm,           xK_Up       ), windows W.focusUp)
+    , ((modm,           xK_m        ), windows W.focusMaster)
+
+    , ((modm,           xK_Right        ), flash "->" >> nextWS)
+    , ((modm,           xK_Left         ), flash "<-" >> prevWS)
+    , ((modm,           xK_bracketright ), flash "->" >> nextWS)
+    , ((modm,           xK_bracketleft  ), flash "<-" >> prevWS)
+    , ((modm .|. shift, xK_Right        ), flash "Move ->" >> shiftToNext >> nextWS)
+    , ((modm .|. shift, xK_Left         ), flash "<- Move" >> shiftToPrev >> prevWS)
+    , ((modm .|. shift, xK_bracketright ), flash "Move ->" >> shiftToNext >> nextWS)
+    , ((modm .|. shift, xK_bracketleft  ), flash "<- Move" >> shiftToPrev >> prevWS)
 
     -- Directional navigation of windows
-    , ((mod .|. alt,        xK_Right    ), N2D.windowGo R False)
-    , ((mod .|. alt,        xK_Left     ), N2D.windowGo L False)
-    , ((mod .|. alt,        xK_Up       ), N2D.windowGo U False)
-    , ((mod .|. alt,        xK_Down     ), N2D.windowGo D False)
+    , ((modm .|. alt,        xK_Right    ), N2D.windowGo R False)
+    , ((modm .|. alt,        xK_Left     ), N2D.windowGo L False)
+    , ((modm .|. alt,        xK_Up       ), N2D.windowGo U False)
+    , ((modm .|. alt,        xK_Down     ), N2D.windowGo D False)
 
     -- swapping
-    , ((mod .|. shift,      xK_Return   ), windows W.swapMaster)
-    , ((mod .|. shift,      xK_j        ), windows W.swapDown)
-    , ((mod .|. shift,      xK_k        ), windows W.swapUp)
-    -- , ((mod,                xK_s        ), sendMessage $ SwapWindow)
+    , ((modm .|. shift,      xK_Return   ), windows W.swapMaster)
+    , ((modm .|. shift,      xK_j        ), windows W.swapDown)
+    , ((modm .|. shift,      xK_k        ), windows W.swapUp)
+    -- , ((modm,                xK_s        ), sendMessage $ SwapWindow)
 
     -- increase or decrease number of windows in the master area
-    , ((mod,                xK_comma    ), sendMessage (IncMasterN 1))
-    , ((mod,                xK_period   ), sendMessage (IncMasterN (-1)))
+    , ((modm,                xK_comma    ), sendMessage (IncMasterN 1))
+    , ((modm,                xK_period   ), sendMessage (IncMasterN (-1)))
 
     -- resizing
-    , ((mod,                xK_h        ), sendMessage Shrink)
-    , ((mod,                xK_l        ), sendMessage Expand)
-    , ((mod .|. shift,      xK_h        ), sendMessage MirrorShrink)
-    , ((mod .|. shift,      xK_l        ), sendMessage MirrorExpand)
+    , ((modm,                xK_h        ), sendMessage Shrink)
+    , ((modm,                xK_l        ), sendMessage Expand)
+    , ((modm .|. shift,      xK_h        ), sendMessage MirrorShrink)
+    , ((modm .|. shift,      xK_l        ), sendMessage MirrorExpand)
 
-    -- search (mod-s [g,h,w,y])
-    , ((mod,                xK_s        ), promptSearch)
-    , ((mod .|. shift,      xK_s        ), selectSearch)
+    -- search (modm-s [g,h,w,y])
+    , ((modm,                xK_s        ), promptSearch)
+    , ((modm .|. shift,      xK_s        ), selectSearch)
 
     -- quit, or restart
-    -- , ((mod .|. shift,      xK_q        ), spawn "xfce4-session-logout")
-    , ((mod .|. shift,      xK_q        ), io (exitWith ExitSuccess)) -- %! Quit xmonad
-    , ((mod .|. shift,      xK_l        ), spawn "systemctl suspend")
-    -- , ((mod .|. alt,        xK_l        ), spawn "xautolock -locknow")
+    -- , ((modm .|. shift,      xK_q        ), spawn "xfce4-session-logout")
+    , ((modm .|. shift,      xK_q        ), io (exitWith ExitSuccess)) -- %! Quit xmonad
+    -- , ((modm .|. shift,      xK_l        ), spawn "systemctl suspend")
+    , ((modm .|. alt,        xK_l        ), spawn "xautolock -locknow")
 
     -- Restart xmonad
-    , ((mod,                xK_q        ), restart "xmonad" True)
+    , ((modm,                xK_q        ), restart "xmonad" True)
 
     -- ungrab mouse cursor from applications which can grab it
-    , ((mod,                xK_i        ), spawn "xdotool key XF86Ungrab")
+    , ((modm,                xK_i        ), spawn "xdotool key XF86Ungrab")
 
     -- open man pages / ssh consoles
-    , ((mod,                xK_F1       ), manPrompt Prompt.def)
-    , ((mod,                xK_F2       ), sshPrompt Prompt.def)
+    , ((modm,                xK_F1       ), manPrompt Prompt.def)
+    , ((modm,                xK_F2       ), sshPrompt Prompt.def)
 
     -- open rofi
     , ((alt,                xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
     , ((ctrl .|. alt,       xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
 
-    , ((mod .|. shift,      xK_slash    ), helpCommand) -- %! Run xmessage with a summary of the default keybindings (useful for beginners)
+    , ((modm .|. shift,      xK_slash    ), helpCommand) -- %! Run xmessage with a summary of the default keybindings (useful for beginners)
 
     ] ++ workspaceKeys ++ screenKeys ++ mediaKeys
 
  where
-    mod   = modMask
     ctrl  = controlMask
     alt   = mod1Mask
     shift = shiftMask
@@ -127,7 +133,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
                       Submap.submap . searchEngineMap $ Search.selectSearch
 
     searchEngineMap :: (Search.SearchEngine -> X ()) -> M.Map (KeyMask, KeySym) (X ())
-    searchEngineMap method = M.fromList $
+    searchEngineMap method = M.fromList
       [ ((0, xK_d), method Search.dictionary)
       , ((0, xK_g), method Search.google)
       , ((0, xK_h), method Search.hoogle)
@@ -145,7 +151,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- mod-shift-[1..9] Move client to workspace N
     workspaceKeys :: [((KeyMask, KeySym), X ())]
     workspaceKeys =
-      [ ((m .|. modMask, k), windows $ f i)
+      [ ((m .|. modm, k), windows $ f i)
         | (i, k) <- zip (cycle $ XMonad.workspaces conf) $ numKeys ++ numpadKeys
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
       ]
@@ -159,7 +165,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- mod-shift-{w,e,r} Move client to screen 1, 2, or 3
     screenKeys :: [((KeyMask, KeySym), X ())]
     screenKeys =
-      [ ((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+      [ ((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_e, xK_w, xK_r] [0..]
         , (f, m)    <- [(W.view, 0), (W.shift, shiftMask)]
       ]
