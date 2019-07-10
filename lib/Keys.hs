@@ -17,6 +17,7 @@ import XMonad.Hooks.ManageDocks
 -- import XMonad.Layout.ComboP (SwapWindow(..))
 import XMonad.Layout.ResizableTile (MirrorResize(..))
 import XMonad.Layout.Spacing
+import XMonad.Layout.BinarySpacePartition
 
 import qualified XMonad.Prompt as Prompt
 import XMonad.Prompt.Man
@@ -75,6 +76,23 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm .|. alt,        xK_Up       ), N2D.windowGo U False)
     , ((modm .|. alt,        xK_Down     ), N2D.windowGo D False)
 
+    -- Binary Space Partition
+    , ((modm .|. alt,               xK_l     ), sendMessage $ ExpandTowards R)
+    , ((modm .|. alt,               xK_h     ), sendMessage $ ExpandTowards L)
+    , ((modm .|. alt,               xK_j     ), sendMessage $ ExpandTowards D)
+    , ((modm .|. alt,               xK_k     ), sendMessage $ ExpandTowards U)
+    , ((modm .|. alt .|. ctrl,      xK_l     ), sendMessage $ ShrinkFrom R)
+    , ((modm .|. alt .|. ctrl,      xK_h     ), sendMessage $ ShrinkFrom L)
+    , ((modm .|. alt .|. ctrl,      xK_j     ), sendMessage $ ShrinkFrom D)
+    , ((modm .|. alt .|. ctrl,      xK_k     ), sendMessage $ ShrinkFrom U)
+    , ((modm,                       xK_r     ), sendMessage Rotate)
+    , ((modm,                       xK_s     ), sendMessage Swap)
+    , ((modm,                       xK_n     ), sendMessage FocusParent)
+    , ((modm .|. ctrl,              xK_n     ), sendMessage SelectNode)
+    , ((modm .|. shift,             xK_n     ), sendMessage MoveNode)
+    , ((modm,                       xK_a     ), sendMessage Balance)
+    , ((modm .|. shift,             xK_a     ), sendMessage Equalize)
+
     -- swapping
     , ((modm .|. shift,      xK_Return   ), windows W.swapMaster)
     , ((modm .|. shift,      xK_j        ), windows W.swapDown)
@@ -97,9 +115,9 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
 
     -- quit, or restart
     -- , ((modm .|. shift,      xK_q        ), spawn "xfce4-session-logout")
-    , ((modm .|. shift,      xK_q        ), io (exitWith ExitSuccess)) -- %! Quit xmonad
+    , ((modm .|. shift,      xK_q        ), io exitSuccess) -- %! Quit xmonad
     -- , ((modm .|. shift,      xK_l        ), spawn "systemctl suspend")
-    , ((modm .|. alt,        xK_l        ), spawn "xautolock -locknow")
+    -- , ((modm .|. alt,        xK_l        ), spawn "xautolock -locknow")
 
     -- Restart xmonad
     , ((modm,                xK_q        ), restart "xmonad" True)
@@ -112,8 +130,11 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm,                xK_F2       ), sshPrompt Prompt.def)
 
     -- open rofi
-    , ((alt,                xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
-    , ((ctrl .|. alt,       xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
+    , ((alt,                 xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
+    , ((ctrl .|. alt,        xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
+
+    -- screenshot tool
+    , ((noModMask,           xK_Print ), spawn "flameshot gui")
 
     , ((modm .|. shift,      xK_slash    ), helpCommand) -- %! Run xmessage with a summary of the default keybindings (useful for beginners)
 

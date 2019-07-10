@@ -1,17 +1,24 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE FlexibleContexts #-}
+
 module Layout (myLayoutHook) where
 
 import XMonad.Layout
+import XMonad.Layout.BinarySpacePartition
+import XMonad.Layout.BorderResize
+import XMonad.Layout.Circle
 -- import XMonad.Layout.ComboP
 -- import XMonad.Layout.Grid
-import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Reflect
+import XMonad.Layout.Renamed (renamed, Rename(Replace))
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.Spacing
 import XMonad.Layout.Tabbed
+import XMonad.Layout.ThreeColumns
 -- import XMonad.Layout.TwoPane
 
-myLayoutHook = ntile ||| rtile ||| mtile ||| full ||| tab
+myLayoutHook = ntile ||| rtile ||| mtile ||| full ||| tab ||| threeCol ||| bsp ||| Circle
   where
     rt      = defaultSpacing 4 $ ResizableTall 1 (2/100) (8/13) []
     -- normal vertical tile
@@ -38,6 +45,11 @@ myLayoutHook = ntile ||| rtile ||| mtile ||| full ||| tab
     -- fullscreen without tabs
     full    = named "[]"    $ noBorders Full
 
+    threeCol = withBorders $ ThreeColMid 1 (2/100) (1/2)
+
+    bsp = withBorders $ borderResize emptyBSP
+
+    withBorders = smartBorders . defaultSpacing 4
     defaultSpacing i = spacingRaw True (uniformBorder i) True (uniformBorder i) True
     uniformBorder i = Border i i i i
 
