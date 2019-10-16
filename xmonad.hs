@@ -6,10 +6,8 @@ import XMonad.Actions.Navigation2D
 import XMonad.Actions.ShowText (handleTimerEvent)
 
 import XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
-import XMonad.Hooks.ManageDocks (manageDocks)
 import XMonad.Hooks.UrgencyHook (withUrgencyHook, NoUrgencyHook(..))
 -- import XMonad.Hooks.SetWMName (setWMName)
-import XMonad.Layout.ShowWName
 
 import XMonad.Util.Run (safeSpawn)
 import XMonad.Util.SpawnOnce (spawnOnOnce)
@@ -23,7 +21,7 @@ import Logging (eventLogHook)
 import qualified Workspaces
 
 main :: IO ()
-main = 
+main =
   do
     safeSpawn "mkfifo" ["/tmp/.xmonad-workspace-log"]
     safeSpawn "mkfifo" ["/tmp/.xmonad-title-log"]
@@ -47,14 +45,13 @@ main =
 
         , handleExtraArgs    = handleExtraArgs desktopConfig
         , keys               = myKeys
-        , layoutHook         = desktopLayoutModifiers $ showWName myLayoutHook
+        , layoutHook         = desktopLayoutModifiers myLayoutHook
         , logHook            = logHook desktopConfig
                                 <+> historyHook
                                 <+> eventLogHook
 
         , manageHook         = manageHook desktopConfig
                                 <+> myManageHook
-                                <+> manageDocks
                                 <+> pbManageHook
 
         , modMask            = mod4Mask
