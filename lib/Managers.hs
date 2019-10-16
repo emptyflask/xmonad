@@ -4,9 +4,8 @@ import XMonad
 import qualified XMonad.StackSet as W
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
+import XMonad.Actions.SpawnOn
 
--- Default managers
---
 -- Match a string against any one of a window's class, title, name or
 -- role.
 matchAny :: String -> Query Bool
@@ -24,6 +23,7 @@ role = stringProperty "WM_WINDOW_ROLE"
 pbManageHook :: ManageHook
 pbManageHook = composeAll $ concat
     [ [ manageDocks ]
+    , [ manageSpawn ]
     , [ manageHook def ]
     , [ isDialog --> doCenterFloat ]
     , [ isFullscreen --> doFullFloat ]
