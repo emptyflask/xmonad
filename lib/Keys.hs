@@ -6,9 +6,9 @@ import qualified XMonad.StackSet as W
 
 import qualified XMonad.Actions.GroupNavigation as GN
 import qualified XMonad.Actions.Navigation2D as N2D
-import qualified XMonad.Actions.Search as Search
+-- import qualified XMonad.Actions.Search as Search
 import qualified XMonad.Actions.ShowText as T
-import qualified XMonad.Actions.Submap as Submap
+-- import qualified XMonad.Actions.Submap as Submap
 import XMonad.Actions.WithAll (sinkAll)
 import XMonad.Actions.CycleWS
 
@@ -61,14 +61,14 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm,           xK_Up       ), windows W.focusUp)
     , ((modm,           xK_m        ), windows W.focusMaster)
 
-    , ((modm,           xK_Right        ), flash "->" >> nextWS)
-    , ((modm,           xK_Left         ), flash "<-" >> prevWS)
-    , ((modm,           xK_bracketright ), flash "->" >> nextWS)
-    , ((modm,           xK_bracketleft  ), flash "<-" >> prevWS)
-    , ((modm .|. shift, xK_Right        ), flash "Move ->" >> shiftToNext >> nextWS)
-    , ((modm .|. shift, xK_Left         ), flash "<- Move" >> shiftToPrev >> prevWS)
-    , ((modm .|. shift, xK_bracketright ), flash "Move ->" >> shiftToNext >> nextWS)
-    , ((modm .|. shift, xK_bracketleft  ), flash "<- Move" >> shiftToPrev >> prevWS)
+    , ((modm,           xK_Right        ), nextWS)
+    , ((modm,           xK_Left         ), prevWS)
+    , ((modm,           xK_bracketright ), nextWS)
+    , ((modm,           xK_bracketleft  ), prevWS)
+    , ((modm .|. shift, xK_Right        ), shiftToNext >> nextWS)
+    , ((modm .|. shift, xK_Left         ), shiftToPrev >> prevWS)
+    , ((modm .|. shift, xK_bracketright ), shiftToNext >> nextWS)
+    , ((modm .|. shift, xK_bracketleft  ), shiftToPrev >> prevWS)
 
     -- Directional navigation of windows
     , ((modm .|. alt,        xK_Right    ), N2D.windowGo R False)
@@ -110,8 +110,8 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm .|. shift,      xK_l        ), sendMessage MirrorExpand)
 
     -- search (modm-s [g,h,w,y])
-    , ((modm,                xK_s        ), promptSearch)
-    , ((modm .|. shift,      xK_s        ), selectSearch)
+    -- , ((modm,                xK_s        ), promptSearch)
+    -- , ((modm .|. shift,      xK_s        ), selectSearch)
 
     -- quit, or restart
     -- , ((modm .|. shift,      xK_q        ), spawn "xfce4-session-logout")
@@ -131,38 +131,37 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
 
     -- open rofi
     , ((alt,                 xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
-    , ((ctrl .|. alt,        xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
-
+    -- , ((ctrl .|. alt,        xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
+    , ((ctrl .|. alt,        xK_c        ), spawn "CM_LAUNCHER=rofi clipmenu")
+ 
     -- screenshot tool
     , ((noModMask,           xK_Print ), spawn "flameshot gui")
 
-    , ((modm .|. shift,      xK_slash    ), helpCommand) -- %! Run xmessage with a summary of the default keybindings (useful for beginners)
-
-    ] ++ workspaceKeys ++ screenKeys ++ mediaKeys
+    ] ++ workspaceKeys ++ mediaKeys
 
  where
     ctrl  = controlMask
     alt   = mod1Mask
     shift = shiftMask
 
-    promptSearch :: X ()
-    promptSearch = do flash "Search ?"
-                      Submap.submap . searchEngineMap $ Search.promptSearch Prompt.def
+    -- promptSearch :: X ()
+    -- promptSearch = do flash "Search ?"
+    --                   Submap.submap . searchEngineMap $ Search.promptSearch Prompt.def
 
-    selectSearch :: X ()
-    selectSearch = do flash "Select Search ?"
-                      Submap.submap . searchEngineMap $ Search.selectSearch
+    -- selectSearch :: X ()
+    -- selectSearch = do flash "Select Search ?"
+    --                   Submap.submap . searchEngineMap $ Search.selectSearch
 
-    searchEngineMap :: (Search.SearchEngine -> X ()) -> M.Map (KeyMask, KeySym) (X ())
-    searchEngineMap method = M.fromList
-      [ ((0, xK_d), method Search.dictionary)
-      , ((0, xK_g), method Search.google)
-      , ((0, xK_h), method Search.hoogle)
-      , ((0, xK_i), method Search.images)
-      , ((0, xK_m), method Search.maps)
-      , ((0, xK_w), method Search.wikipedia)
-      , ((0, xK_y), method Search.youtube)
-      ]
+    -- searchEngineMap :: (Search.SearchEngine -> X ()) -> M.Map (KeyMask, KeySym) (X ())
+    -- searchEngineMap method = M.fromList
+    --   [ ((0, xK_d), method Search.dictionary)
+    --   , ((0, xK_g), method Search.google)
+    --   , ((0, xK_h), method Search.hoogle)
+    --   , ((0, xK_i), method Search.images)
+    --   , ((0, xK_m), method Search.maps)
+    --   , ((0, xK_w), method Search.wikipedia)
+    --   , ((0, xK_y), method Search.youtube)
+    --   ]
 
     flash :: String -> X ()
     flash text =
@@ -182,14 +181,14 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
                         xK_KP_Left, xK_KP_Begin, xK_KP_Right,
                         xK_KP_Home, xK_KP_Up,    xK_KP_Page_Up]
 
-    -- mod-{w,e,r}       Switch to physical/Xinerama screens 1, 2, or 3
-    -- mod-shift-{w,e,r} Move client to screen 1, 2, or 3
-    screenKeys :: [((KeyMask, KeySym), X ())]
-    screenKeys =
-      [ ((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_e, xK_w, xK_r] [0..]
-        , (f, m)    <- [(W.view, 0), (W.shift, shiftMask)]
-      ]
+    -- -- mod-{w,e,r}       Switch to physical/Xinerama screens 1, 2, or 3
+    -- -- mod-shift-{w,e,r} Move client to screen 1, 2, or 3
+    -- screenKeys :: [((KeyMask, KeySym), X ())]
+    -- screenKeys =
+    --   [ ((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
+    --     | (key, sc) <- zip [xK_e, xK_w, xK_r] [0..]
+    --     , (f, m)    <- [(W.view, 0), (W.shift, shiftMask)]
+    --   ]
 
     mediaKeys :: [((KeyMask, KeySym), X ())]
     mediaKeys =
@@ -197,56 +196,3 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
       , ((0 , xF86XK_AudioLowerVolume), spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
       , ((0 , xF86XK_AudioMute),        spawn "pactl set-sink-mute   @DEFAULT_SINK@ toggle")
       ]
-
-    helpCommand :: X ()
-    helpCommand = spawn ("echo \"" ++ help ++ "\" | xmessage -file -")
-
-help :: String
-help = unlines ["The modifier key is 'alt'. Default keybindings:",
-    "",
-    "-- launching and killing programs",
-    "mod-Shift-Enter  Launch xterminal",
-    "mod-p            Launch dmenu",
-    "mod-Shift-p      Launch gmrun",
-    "mod-Shift-c      Close/kill the focused window",
-    "mod-Space        Rotate through the available layout algorithms",
-    "mod-Shift-Space  Reset the layouts on the current workSpace to default",
-    "mod-n            Resize/refresh viewed windows to the correct size",
-    "",
-    "-- move focus up or down the window stack",
-    "mod-Tab        Move focus to the next window",
-    "mod-Shift-Tab  Move focus to the previous window",
-    "mod-j          Move focus to the next window",
-    "mod-k          Move focus to the previous window",
-    "mod-m          Move focus to the master window",
-    "",
-    "-- modifying the window order",
-    "mod-Return   Swap the focused window and the master window",
-    "mod-Shift-j  Swap the focused window with the next window",
-    "mod-Shift-k  Swap the focused window with the previous window",
-    "",
-    "-- resizing the master/slave ratio",
-    "mod-h  Shrink the master area",
-    "mod-l  Expand the master area",
-    "",
-    "-- floating layer support",
-    "mod-t  Push window back into tiling; unfloat and re-tile it",
-    "",
-    "-- increase or decrease number of windows in the master area",
-    "mod-comma  (mod-,)   Increment the number of windows in the master area",
-    "mod-period (mod-.)   Deincrement the number of windows in the master area",
-    "",
-    "-- quit, or restart",
-    "mod-Shift-q  Quit xmonad",
-    "mod-q        Restart xmonad",
-    "",
-    "-- Workspaces & screens",
-    "mod-[1..9]         Switch to workSpace N",
-    "mod-Shift-[1..9]   Move client to workspace N",
-    "mod-{w,e,r}        Switch to physical/Xinerama screens 1, 2, or 3",
-    "mod-Shift-{w,e,r}  Move client to screen 1, 2, or 3",
-    "",
-    "-- Mouse bindings: default actions bound to mouse events",
-    "mod-button1  Set the window to floating mode and move by dragging",
-    "mod-button2  Raise the window to the top of the stack",
-    "mod-button3  Set the window to floating mode and resize by dragging"]
