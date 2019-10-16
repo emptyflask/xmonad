@@ -12,6 +12,7 @@ import XMonad.Hooks.UrgencyHook (withUrgencyHook, NoUrgencyHook(..))
 import XMonad.Layout.ShowWName
 
 import XMonad.Util.Run (safeSpawn)
+import XMonad.Util.SpawnOnce (spawnOnOnce)
 
 -- import System.Taffybar.Hooks.PagerHints (pagerHints)
 
@@ -61,7 +62,12 @@ main =
         , normalBorderColor  = "#444444"
         , rootMask           = rootMask desktopConfig
 
-        , startupHook        = startupHook desktopConfig
+        , startupHook        = do
+                                 startupHook desktopConfig
+                                 spawnOnOnce "2" "thunderbird"
+                                 spawnOnOnce "3" "slack"
+                                 spawnOnOnce "3" "signal-desktop"
+                                 spawnOnOnce "9" "spotify"
                                 -- >> setWMName "LG3D" -- Java app focus fix
 
         , terminal           = "kitty"
