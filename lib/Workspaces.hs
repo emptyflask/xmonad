@@ -12,13 +12,13 @@ workspaces :: [Workspace]
 workspaces =
   [ Workspace "Main" "\xf120"
   , Workspace "Mail" "\xf0e0"
-  , Workspace "Chat" "\xf0eb"
+  , Workspace "Chat" "\xf075"
   , Workspace "Work-1" "\xf121"
   , Workspace "Work-2" "\xf121"
   , Workspace "Work-3" "\xf121"
   , Workspace "Work-4" "\xf121"
   , Workspace "Games" "\xf11b"
-  , Workspace "Music" "\xf001"
+  , Workspace "Music" "\xf025"
   ]
 
 numbered :: [String]
