@@ -6,7 +6,7 @@ cabal-version:       >=1.10
 executable my-xmonad
   main-is:             ../xmonad.hs
   -- other-modules lists custom modules in my ~/.xmonad/lib/ directory
-  other-modules:       Workspaces, Keys, Logging, Layout, Managers
+  other-modules:       Workspaces, Keys, Logging, Layout, Managers, Colors
   build-depends:       base
                      , containers
                      , xmonad >= 0.15

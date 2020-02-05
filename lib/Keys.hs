@@ -23,8 +23,12 @@ import qualified XMonad.Prompt as Prompt
 import XMonad.Prompt.Man
 import XMonad.Prompt.Ssh
 
+import XMonad.Util.NamedScratchpad (namedScratchpadAction)
+
 import Graphics.X11.ExtraTypes.XF86
 import System.Exit
+
+import Managers (scratchpads)
 
 -- Keyboard --
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
@@ -61,14 +65,14 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm,           xK_Up       ), windows W.focusUp)
     , ((modm,           xK_m        ), windows W.focusMaster)
 
-    , ((modm,           xK_Right        ), nextWS)
-    , ((modm,           xK_Left         ), prevWS)
-    , ((modm,           xK_bracketright ), nextWS)
-    , ((modm,           xK_bracketleft  ), prevWS)
-    , ((modm .|. shift, xK_Right        ), shiftToNext >> nextWS)
-    , ((modm .|. shift, xK_Left         ), shiftToPrev >> prevWS)
-    , ((modm .|. shift, xK_bracketright ), shiftToNext >> nextWS)
-    , ((modm .|. shift, xK_bracketleft  ), shiftToPrev >> prevWS)
+    , ((modm,           xK_Right        ), moveTo Next (WSIs hiddenNotNSP))
+    , ((modm,           xK_Left         ), moveTo Prev (WSIs hiddenNotNSP))
+    , ((modm,           xK_bracketright ), moveTo Next (WSIs hiddenNotNSP))
+    , ((modm,           xK_bracketleft  ), moveTo Prev (WSIs hiddenNotNSP))
+    , ((modm .|. shift, xK_Right        ), shiftTo Next (WSIs hiddenNotNSP))
+    , ((modm .|. shift, xK_Left         ), shiftTo Prev (WSIs hiddenNotNSP))
+    , ((modm .|. shift, xK_bracketright ), shiftTo Next (WSIs hiddenNotNSP))
+    , ((modm .|. shift, xK_bracketleft  ), shiftTo Prev (WSIs hiddenNotNSP))
 
     -- Directional navigation of windows
     , ((modm .|. alt,        xK_Right    ), N2D.windowGo R False)
@@ -134,6 +138,10 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     -- , ((ctrl .|. alt,        xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
     , ((ctrl .|. alt,        xK_c        ), spawn "CM_LAUNCHER=rofi clipmenu")
  
+    -- scratchpads
+    , ((modm,                xK_z        ), namedScratchpadAction scratchpads "zeal")
+    , ((modm,                xK_grave    ), namedScratchpadAction scratchpads "htop")
+
     -- screenshot tool
     , ((noModMask,           xK_Print ), spawn "flameshot gui")
 
@@ -172,10 +180,11 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     workspaceKeys :: [((KeyMask, KeySym), X ())]
     workspaceKeys =
       [ ((m .|. modm, k), windows $ f i)
-        | (i, k) <- zip (cycle $ XMonad.workspaces conf) $ numKeys ++ numpadKeys
+        | (i, k) <- zip (cycle wkSpaces) $ numKeys ++ numpadKeys
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
       ]
         where
+          wkSpaces   = XMonad.workspaces conf
           numKeys    = [xK_1 .. xK_9]
           numpadKeys = [xK_KP_End,  xK_KP_Down,  xK_KP_Page_Down,
                         xK_KP_Left, xK_KP_Begin, xK_KP_Right,
@@ -196,3 +205,8 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
       , ((0 , xF86XK_AudioLowerVolume), spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
       , ((0 , xF86XK_AudioMute),        spawn "pactl set-sink-mute   @DEFAULT_SINK@ toggle")
       ]
+
+    hiddenNotNSP :: X (WindowSpace -> Bool)
+    hiddenNotNSP = do
+      hs <- gets $ map W.tag . W.hidden . windowset
+      return (\w -> (W.tag w) /= "NSP" && (W.tag w) `elem` hs)

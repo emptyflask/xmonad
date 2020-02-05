@@ -1,7 +1,6 @@
 module Logging (eventLogHook) where
 
-import Data.List (sort)
--- import Data.Function (on)
+import Text.Read (readMaybe)
 import Control.Monad
 import XMonad
 -- import XMonad.Util.Run (safeSpawn)
@@ -16,18 +15,13 @@ import qualified Workspaces
 
 eventLogHook :: X ()
 eventLogHook = do
-  winset <- gets windowset
+  winset   <- gets windowset
   wintitle <- maybe (return "") (fmap show . getName) . W.peek $ winset
-  let currWs = W.currentTag winset
-  let wss = map W.tag $ W.workspaces winset
-  let wsStr = join $ map ((Workspaces.polybarString $ read currWs) . read) $ sort wss 
+
+  let currWs = maybe 1 id (readMaybe . W.currentTag $ winset)
+  let allWs = [1 .. (length Workspaces.workspaces)]
+
+  let wsString = join $ map (Workspaces.polybarString currWs) allWs
 
   io $ appendFile "/tmp/.xmonad-title-log" (wintitle ++ "\n")
-  io $ appendFile "/tmp/.xmonad-workspace-log" (wsStr ++ "\n")
-
-  -- where
-  --   sort' = sortBy (compare `on` (!! 0))
---     fmt currWs ws
---       | currWs == ws = "%{B#2c3e50}%{u#6e98a4} " ++ num ws ++ " %{B-}%{-u}"
---       | otherwise    = " " ++ num ws ++ " "
---     num = take 1
+  io $ appendFile "/tmp/.xmonad-workspace-log" (wsString ++ "\n")

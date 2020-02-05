@@ -16,7 +16,7 @@ import XMonad.Util.SpawnOnce (spawnOnOnce)
 
 import Keys (myKeys)
 import Layout (myLayoutHook)
-import Managers (pbManageHook, myManageHook)
+import Managers (myManageHook)
 import Logging (eventLogHook)
 import qualified Workspaces
 
@@ -28,7 +28,7 @@ main =
 
     xmonad
       $ withUrgencyHook NoUrgencyHook
-      $ ewmh 
+      $ ewmh
       $ withNavigation2DConfig def
         { defaultTiledNavigation = hybridOf sideNavigation centerNavigation
         }
@@ -52,7 +52,6 @@ main =
 
         , manageHook         = manageHook desktopConfig
                                 <+> myManageHook
-                                <+> pbManageHook
 
         , modMask            = mod4Mask
         , mouseBindings      = mouseBindings desktopConfig
