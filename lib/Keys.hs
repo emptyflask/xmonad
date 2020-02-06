@@ -136,11 +136,12 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     -- open rofi
     , ((alt,                 xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
     -- , ((ctrl .|. alt,        xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
-    , ((ctrl .|. alt,        xK_c        ), spawn "CM_LAUNCHER=rofi clipmenu")
+    , ((modm .|. alt,        xK_c        ), spawn "CM_LAUNCHER=rofi clipmenu")
  
     -- scratchpads
-    , ((modm,                xK_z        ), namedScratchpadAction scratchpads "zeal")
+    , ((modm,                xK_c        ), namedScratchpadAction scratchpads "calc")
     , ((modm,                xK_grave    ), namedScratchpadAction scratchpads "htop")
+    , ((modm,                xK_z        ), namedScratchpadAction scratchpads "zeal")
 
     -- screenshot tool
     , ((noModMask,           xK_Print ), spawn "flameshot gui")

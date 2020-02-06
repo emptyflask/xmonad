@@ -9,10 +9,15 @@ import XMonad.Util.NamedScratchpad
 
 
 scratchpads :: [NamedScratchpad]
-scratchpads = [ NS "zeal" spawnZeal findZeal manageZeal
+scratchpads = [ NS "calc" spawnCalc findCalc manageCalc
               , NS "htop" spawnHtop findHtop manageHtop
+              , NS "zeal" spawnZeal findZeal manageZeal
               ]
     where
+      spawnCalc  = "qalculate-gtk"
+      findCalc   = className =? "Qalculate-gtk"
+      manageCalc = doCenterFloat
+
       spawnHtop  = "kitty --class=htop htop"
       findHtop   = className =? "htop"
       manageHtop = customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3)
