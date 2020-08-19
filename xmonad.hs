@@ -37,7 +37,7 @@ main =
         , clickJustFocuses   = False
         , clientMask         = clientMask desktopConfig
         , focusFollowsMouse  = False
-        , focusedBorderColor = "#990000"
+        , focusedBorderColor = "#ca9133"
 
         , handleEventHook    = handleEventHook desktopConfig
                                 <+> fullscreenEventHook
@@ -55,7 +55,7 @@ main =
 
         , modMask            = mod4Mask
         , mouseBindings      = mouseBindings desktopConfig
-        , normalBorderColor  = "#444444"
+        , normalBorderColor  = "#282828"
         , rootMask           = rootMask desktopConfig
 
         , startupHook        = do

@@ -1,42 +1,39 @@
 module Keys (myKeys) where
 
-import XMonad
-import qualified Data.Map as M
-import qualified XMonad.StackSet as W
+import qualified Data.Map                           as M
+import           XMonad
+import qualified XMonad.StackSet                    as W
 
-import qualified XMonad.Actions.GroupNavigation as GN
-import qualified XMonad.Actions.Navigation2D as N2D
--- import qualified XMonad.Actions.Search as Search
-import qualified XMonad.Actions.ShowText as T
--- import qualified XMonad.Actions.Submap as Submap
-import XMonad.Actions.WithAll (sinkAll)
-import XMonad.Actions.CycleWS
+import           XMonad.Actions.CycleWS
+import qualified XMonad.Actions.GroupNavigation     as GN
+import qualified XMonad.Actions.Navigation2D        as N2D
+import qualified XMonad.Actions.ShowText            as T
+import           XMonad.Actions.WithAll             (sinkAll)
 
-import XMonad.Hooks.ManageDocks
+import           XMonad.Hooks.ManageDocks
 
--- import XMonad.Layout.ComboP (SwapWindow(..))
-import XMonad.Layout.ResizableTile (MirrorResize(..))
-import XMonad.Layout.Spacing
-import XMonad.Layout.BinarySpacePartition
+import           XMonad.Layout.BinarySpacePartition
+import           XMonad.Layout.ResizableTile        (MirrorResize (..))
+import           XMonad.Layout.Spacing
 
-import qualified XMonad.Prompt as Prompt
-import XMonad.Prompt.Man
-import XMonad.Prompt.Ssh
+import qualified XMonad.Prompt                      as Prompt
+import           XMonad.Prompt.Man
+import           XMonad.Prompt.Ssh
 
-import XMonad.Util.NamedScratchpad (namedScratchpadAction)
+import           XMonad.Util.NamedScratchpad        (namedScratchpadAction)
 
-import Graphics.X11.ExtraTypes.XF86
-import System.Exit
+import           Graphics.X11.ExtraTypes.XF86
+import           System.Exit
 
-import Managers (scratchpads)
+import           Managers                           (scratchpads)
 
 -- Keyboard --
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     -- launching and killing programs
     [ ((modm,                xK_Return   ), spawn "kitty")
-    , ((modm,                xK_o        ), spawn "xfrun4")
-    , ((modm,                xK_f        ), spawn "pcmanfm")
+    , ((modm .|. alt,        xK_Return   ), spawn "urxvt")
+    , ((modm,                xK_f        ), spawn "pcmanfm-qt")
     , ((modm .|. shift,      xK_c        ), kill)
 
     -- layouts
@@ -56,7 +53,7 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm,                xK_F5       ), flash "Refresh" >> refresh)
 
     -- focus
-    , ((alt,           xK_Tab      ), GN.nextMatch GN.History (return True))
+    , ((alt,            xK_Tab      ), GN.nextMatch GN.History (return True))
     , ((modm,           xK_Tab      ), moveTo Next NonEmptyWS)
     , ((modm .|. shift, xK_Tab      ), moveTo Prev NonEmptyWS)
     , ((modm,           xK_j        ), windows W.focusDown)
@@ -120,7 +117,7 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     -- quit, or restart
     -- , ((modm .|. shift,      xK_q        ), spawn "xfce4-session-logout")
     , ((modm .|. shift,      xK_q        ), io exitSuccess) -- %! Quit xmonad
-    -- , ((modm .|. shift,      xK_l        ), spawn "systemctl suspend")
+    , ((modm .|. ctrl,       xK_q        ), spawn "systemctl suspend")
     -- , ((modm .|. alt,        xK_l        ), spawn "xautolock -locknow")
 
     -- Restart xmonad
@@ -133,11 +130,12 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm,                xK_F1       ), manPrompt Prompt.def)
     , ((modm,                xK_F2       ), sshPrompt Prompt.def)
 
-    -- open rofi
-    , ((alt,                 xK_space    ), spawn "rofi -plugin-path /usr/local/lib/rofi -show combi")
+    -- rofi
+    , ((alt,                 xK_space    ), spawn "rofi -combi-modi window,drun -modi combi -show combi")
+    , ((modm,                xK_o        ), spawn "rofi -modi run -show run")
     -- , ((ctrl .|. alt,        xK_c        ), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -theme oxide -width 900 -lines 15")
     , ((modm .|. alt,        xK_c        ), spawn "CM_LAUNCHER=rofi clipmenu")
- 
+
     -- scratchpads
     , ((modm,                xK_c        ), namedScratchpadAction scratchpads "calc")
     , ((modm,                xK_grave    ), namedScratchpadAction scratchpads "htop")
