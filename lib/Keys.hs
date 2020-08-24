@@ -5,6 +5,7 @@ import           XMonad
 import qualified XMonad.StackSet                    as W
 
 import           XMonad.Actions.CycleWS
+import qualified XMonad.Actions.GridSelect          as GS
 import qualified XMonad.Actions.GroupNavigation     as GN
 import qualified XMonad.Actions.Navigation2D        as N2D
 import qualified XMonad.Actions.ShowText            as T
@@ -21,6 +22,7 @@ import           XMonad.Prompt.Man
 import           XMonad.Prompt.Ssh
 
 import           XMonad.Util.NamedScratchpad        (namedScratchpadAction)
+import           XMonad.Util.Run                    (runInTerm)
 
 import           Graphics.X11.ExtraTypes.XF86
 import           System.Exit
@@ -31,10 +33,11 @@ import           Managers                           (scratchpads)
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     -- launching and killing programs
-    [ ((modm,                xK_Return   ), spawn "kitty")
-    , ((modm .|. alt,        xK_Return   ), spawn "urxvt")
-    , ((modm,                xK_f        ), spawn "pcmanfm-qt")
-    , ((modm .|. shift,      xK_c        ), kill)
+    [ ((modm,                     xK_Return   ), spawn "kitty")
+    , ((modm .|. alt,             xK_Return   ), spawn "urxvt")
+    , ((modm,                     xK_f        ), spawn "pcmanfm-qt")
+    , ((modm .|. shift,           xK_c        ), kill)
+    , ((modm .|. shift .|. ctrl,  xK_c        ), spawn "xkill")
 
     -- layouts
     , ((modm,                xK_b        ), sendMessage ToggleStruts)
@@ -62,14 +65,14 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm,           xK_Up       ), windows W.focusUp)
     , ((modm,           xK_m        ), windows W.focusMaster)
 
-    , ((modm,           xK_Right        ), moveTo Next (WSIs hiddenNotNSP))
-    , ((modm,           xK_Left         ), moveTo Prev (WSIs hiddenNotNSP))
-    , ((modm,           xK_bracketright ), moveTo Next (WSIs hiddenNotNSP))
-    , ((modm,           xK_bracketleft  ), moveTo Prev (WSIs hiddenNotNSP))
-    , ((modm .|. shift, xK_Right        ), shiftTo Next (WSIs hiddenNotNSP))
-    , ((modm .|. shift, xK_Left         ), shiftTo Prev (WSIs hiddenNotNSP))
-    , ((modm .|. shift, xK_bracketright ), shiftTo Next (WSIs hiddenNotNSP))
-    , ((modm .|. shift, xK_bracketleft  ), shiftTo Prev (WSIs hiddenNotNSP))
+    , ((modm,           xK_Right        ), moveTo Next realWorkspace)
+    , ((modm,           xK_Left         ), moveTo Prev realWorkspace)
+    , ((modm,           xK_bracketright ), moveTo Next realWorkspace)
+    , ((modm,           xK_bracketleft  ), moveTo Prev realWorkspace)
+    , ((modm .|. shift, xK_Right        ), shiftTo Next realWorkspace)
+    , ((modm .|. shift, xK_Left         ), shiftTo Prev realWorkspace)
+    , ((modm .|. shift, xK_bracketright ), shiftTo Next realWorkspace)
+    , ((modm .|. shift, xK_bracketleft  ), shiftTo Prev realWorkspace)
 
     -- Directional navigation of windows
     , ((modm .|. alt,        xK_Right    ), N2D.windowGo R False)
@@ -110,6 +113,9 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm .|. shift,      xK_h        ), sendMessage MirrorShrink)
     , ((modm .|. shift,      xK_l        ), sendMessage MirrorExpand)
 
+    -- grid select
+    , ((modm,                xK_g        ), GS.goToSelected GS.def)
+
     -- search (modm-s [g,h,w,y])
     -- , ((modm,                xK_s        ), promptSearch)
     -- , ((modm .|. shift,      xK_s        ), selectSearch)
@@ -140,6 +146,8 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     , ((modm,                xK_c        ), namedScratchpadAction scratchpads "calc")
     , ((modm,                xK_grave    ), namedScratchpadAction scratchpads "htop")
     , ((modm,                xK_z        ), namedScratchpadAction scratchpads "zeal")
+
+    , ((modm,                xK_v        ), runInTerm "" "alsamixer -c 0")
 
     -- screenshot tool
     , ((noModMask,           xK_Print ), spawn "flameshot gui")
@@ -204,6 +212,9 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
       , ((0 , xF86XK_AudioLowerVolume), spawn "pactl set-sink-volume @DEFAULT_SINK@ -2%")
       , ((0 , xF86XK_AudioMute),        spawn "pactl set-sink-mute   @DEFAULT_SINK@ toggle")
       ]
+
+    realWorkspace :: WSType
+    realWorkspace = WSIs hiddenNotNSP
 
     hiddenNotNSP :: X (WindowSpace -> Bool)
     hiddenNotNSP = do
