@@ -1,22 +1,23 @@
 module Workspaces where
 
 import qualified Data.Map.Strict as M
-import Data.Maybe
+import           Data.Maybe
 
 data Workspace = Workspace
-  { name :: String
-  , glyph :: String
-  } deriving (Show)
+    { name  :: String
+    , glyph :: String
+    }
+    deriving (Show)
 
 workspaces :: [Workspace]
 workspaces =
   [ Workspace "Main" "\xf120"
   , Workspace "Mail" "\xf0e0"
   , Workspace "Chat" "\xf075"
-  , Workspace "Work-1" "\xf121"
-  , Workspace "Work-2" "\xf121"
-  , Workspace "Work-3" "\xf121"
-  , Workspace "Work-4" "\xf121"
+  , Workspace "Work-1" "\xf3a5"
+  , Workspace "Work-2" "\x03bb"
+  , Workspace "Work-3" "\xf03e"
+  , Workspace "Work-4" "\xf1b2"
   , Workspace "Games" "\xf11b"
   , Workspace "Music" "\xf025"
   ]
