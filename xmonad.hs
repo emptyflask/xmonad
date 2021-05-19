@@ -1,35 +1,32 @@
-import XMonad
-import XMonad.Config.Desktop (desktopConfig, desktopLayoutModifiers)
+import           XMonad
+import           XMonad.Config.Desktop          (desktopConfig,
+                                                 desktopLayoutModifiers)
 
-import XMonad.Actions.GroupNavigation (historyHook)
-import XMonad.Actions.Navigation2D
-import XMonad.Actions.ShowText (handleTimerEvent)
+import           XMonad.Actions.GroupNavigation (historyHook)
+import           XMonad.Actions.Navigation2D
+import           XMonad.Actions.ShowText        (handleTimerEvent)
 
-import XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
-import XMonad.Hooks.UrgencyHook (withUrgencyHook, NoUrgencyHook(..))
--- import XMonad.Hooks.SetWMName (setWMName)
+import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.EwmhDesktops      (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.SetWMName
+import           XMonad.Hooks.UrgencyHook       (NoUrgencyHook (..),
+                                                 withUrgencyHook)
 
-import XMonad.Util.Run (safeSpawn)
-import XMonad.Util.SpawnOnce (spawnOnOnce)
+import           XMonad.Util.SpawnOnce          (spawnOnOnce)
 
--- import System.Taffybar.Hooks.PagerHints (pagerHints)
-
-import Keys (myKeys)
-import Layout (myLayoutHook)
-import Managers (myManageHook)
-import Logging (eventLogHook)
+import           Keys                           (myKeys)
+import           Layout                         (myLayoutHook)
+-- import           Logging                        (eventLogHook)
+import           Managers                       (myManageHook)
 import qualified Workspaces
 
 main :: IO ()
-main =
-  do
-    safeSpawn "mkfifo" ["/tmp/.xmonad-workspace-log"]
-    safeSpawn "mkfifo" ["/tmp/.xmonad-title-log"]
-
-    xmonad
-      $ withUrgencyHook NoUrgencyHook
-      $ ewmh
-      $ withNavigation2DConfig def
+main = xmonad =<< xmobar myConfig
+  where
+    myConfig =
+      withUrgencyHook NoUrgencyHook
+      . ewmh
+      . withNavigation2DConfig def
         { defaultTiledNavigation = hybridOf sideNavigation centerNavigation
         }
       $ desktopConfig
@@ -48,7 +45,8 @@ main =
         , layoutHook         = desktopLayoutModifiers myLayoutHook
         , logHook            = logHook desktopConfig
                                 <+> historyHook
-                                <+> eventLogHook
+                                <+> dynamicLog
+                                -- <+> eventLogHook
 
         , manageHook         = manageHook desktopConfig
                                 <+> myManageHook
@@ -57,16 +55,15 @@ main =
         , mouseBindings      = mouseBindings desktopConfig
         , normalBorderColor  = "#282828"
         , rootMask           = rootMask desktopConfig
-
-        , startupHook        = do
-                                 startupHook desktopConfig
-                                 spawnOnOnce "2" "thunderbird"
-                                 spawnOnOnce "3" "slack"
-                                 spawnOnOnce "3" "signal-desktop"
-                                 spawnOnOnce "9" "spotify"
-                                -- >> setWMName "LG3D" -- Java app focus fix
-
+        , startupHook        = startup
         , terminal           = "kitty"
-
         , workspaces         = Workspaces.numbered
         }
+
+    startup = do
+          startupHook desktopConfig
+          spawnOnOnce "2" "thunderbird"
+          spawnOnOnce "3" "slack"
+          spawnOnOnce "3" "signal-desktop"
+          spawnOnOnce "9" "spotify"
+          setWMName "LG3D" -- Java app focus fix

@@ -1,0 +1,72 @@
+Config
+   { font             = "xft:Noto Sans Mono:pixelsize=13"
+   , additionalFonts  = [ "xft:Font Awesome 5 Free:style=Solid:pixelsize=13" ]
+   , borderColor      = "white"
+   , border           = NoBorder
+   , bgColor          = "#282828"
+   , fgColor          = "#f9f7dd"
+   , alpha            = 192               -- default: 255
+   , position         = TopSize L 100 26
+   , textOffset       = -1                -- default: -1
+   , iconOffset       = -1                -- default: -1
+   , lowerOnStart     = True
+   , pickBroadest     = False             -- default: False
+   , persistent       = True
+   , hideOnStart      = False
+   , iconRoot         = "/home/jon/.xmonad/resources/icons"
+   , allDesktops      = True              -- default: True
+   , overrideRedirect = False             -- default: True
+   , commands         =
+      [ Run StdinReader
+      , Run CoreTemp
+         [ "-t", "<fn=1><fc=#928374></fc></fn> <core0>°C"
+         , "-H", "70", "-h", "#cc241d"
+         , "-L", "40", "-l", "#83a598"
+         , "-n", "#98971a"
+         ] 50
+
+      , Run Date
+         "<action=`popup-calendar.sh --popup` button=1><fn=1><fc=#928374></fc></fn></action> <fc=#ee9a00>%a %Y-%m-%d %I:%M %p</fc>"
+         "date" 10
+
+      , Run DiskU
+         [ ("/", "<fn=1><fc=#928374></fc></fn> <usedp>% used, <free> free") ]
+         [] 300
+
+      , Run DynNetwork
+         [ "-t", "<fn=1><fc=#928374></fc></fn> <dev> <fn=1><fc=#928374></fc></fn><rx> <fn=1><fc=#928374></fc></fn><tx>"
+         , "-w", "7"
+         , "-S", "True"
+         , "--", "--devices", "wlp10s0,eno1"
+         ] 20
+
+      , Run Memory
+         [ "-t", "<fn=1><fc=#928374></fc></fn> <usedratio>% used, <available>M free"] 10
+
+      , Run MultiCpu
+         [ "-t", "<fn=1><fc=#928374></fc></fn> <autoipat>"
+         , "--"
+         , "--fallback-icon-pattern", "<icon=load_%%.xpm/>"
+         ] 10
+
+      , Run Weather "KSTP"
+         [ "-t", "<fn=1><fc=#928374></fc></fn> St Paul: <tempF>°F"
+         , "-L", "32", "-H", "86"
+         , "--normal", "#b8bb26", "--high", "#cc241d", "--low", "#83a598"
+         ] 18000
+
+      , Run Alsa "default" "Master"
+         [ "-c", "#cc241d"
+         , "-t", "<fn=1><fc=#928374></fc></fn> <volume>% <status>"
+         , "--"
+         , "--on", ""
+         , "--off", "[muted]"
+         ]
+      ]
+   , sepChar = "%"
+   , alignSep = "}{"
+
+   , template = " %StdinReader% }\
+      \%multicpu% <fc=#665c54>|</fc> %coretemp% <fc=#665c54>|</fc> %memory% <fc=#665c54>|</fc> %disku% <fc=#665c54>|</fc> %dynnetwork% \
+      \{ %alsa:default:Master% <fc=#665c54>|</fc> %KSTP% <fc=#665c54>|</fc> %date% "
+   }

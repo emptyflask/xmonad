@@ -1,27 +1,24 @@
+{-# LANGUAGE FlexibleContexts          #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module Layout (myLayoutHook) where
 
-import XMonad.Layout
-import XMonad.Layout.BinarySpacePartition
-import XMonad.Layout.BorderResize
--- import XMonad.Layout.ComboP
--- import XMonad.Layout.Grid
-import XMonad.Layout.Column
-import XMonad.Layout.NoBorders
-import XMonad.Layout.Reflect
-import XMonad.Layout.Renamed (renamed, Rename(Replace))
-import XMonad.Layout.ResizableTile
-import XMonad.Layout.Spacing
-import XMonad.Layout.Tabbed
-import XMonad.Layout.ThreeColumns
-import XMonad.Layout.ShowWName
--- import XMonad.Layout.TwoPane
+import           XMonad.Layout
+import           XMonad.Layout.BinarySpacePartition
+import           XMonad.Layout.BorderResize
+import           XMonad.Layout.Column
+import           XMonad.Layout.NoBorders
+import           XMonad.Layout.Reflect
+import           XMonad.Layout.Renamed              (Rename (Replace), renamed)
+import           XMonad.Layout.ResizableTile
+import           XMonad.Layout.ShowWName
+import           XMonad.Layout.Spacing
+import           XMonad.Layout.Tabbed
+import           XMonad.Layout.ThreeColumns
 
-import qualified Colors as C
+import qualified Colors                             as C
 
-myLayoutHook = showWName $ tallLeft ||| tallRight ||| full ||| threeCol ||| bsp ||| tab
+myLayoutHook = showWName $ tallLeft ||| tallRight ||| full ||| threeCol ||| bsp ||| tab ||| one
   where
     tallLeft   = named "[]="   rt
     tallRight  = named "=[]"   $ reflectHoriz rt

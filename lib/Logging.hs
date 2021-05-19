@@ -1,11 +1,11 @@
 module Logging (eventLogHook) where
 
-import Text.Read (readMaybe)
-import Control.Monad
-import XMonad
+import           Control.Monad
+import           Text.Read                (readMaybe)
+import           XMonad
 -- import XMonad.Util.Run (safeSpawn)
-import XMonad.Util.NamedWindows (getName)
-import qualified XMonad.StackSet as W
+import qualified XMonad.StackSet          as W
+import           XMonad.Util.NamedWindows (getName)
 
 import qualified Workspaces
 
