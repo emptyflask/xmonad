@@ -1,11 +1,14 @@
-{ pkgs ? import <nixpkgs> {} }:
-pkgs.mkShell {
-  buildInputs = [
-    (pkgs.haskellPackages.ghcWithPackages (hpkgs: with hpkgs; [
-      containers
-      xmonad
-      xmonad-contrib
-      X11
-    ]))
-  ];
-}
+{ nixpkgs ? import <nixpkgs> {} }:
+
+let
+  inherit (nixpkgs) pkgs;
+  inherit (pkgs) haskellPackages;
+
+  project = import ./release.nix;
+
+in
+  pkgs.stdenv.mkDerivation {
+    name = "shell";
+    buildInputs = project.env.nativeBuildInputs;
+  }
+

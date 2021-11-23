@@ -129,6 +129,8 @@ myKeys conf@ XConfig {XMonad.modMask = modm} = M.fromList $
     -- Restart xmonad
     , ((modm,                xK_q        ), restart "xmonad" True)
 
+    , ((modm,                xK_p        ), spawn "systemctl --user restart picom.service")
+
     -- ungrab mouse cursor from applications which can grab it
     , ((modm,                xK_i        ), spawn "xdotool key XF86Ungrab")
 

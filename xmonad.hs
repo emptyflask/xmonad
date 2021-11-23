@@ -1,4 +1,5 @@
 import           XMonad
+
 import           XMonad.Config.Desktop          (desktopConfig,
                                                  desktopLayoutModifiers)
 
@@ -6,25 +7,24 @@ import           XMonad.Actions.GroupNavigation (historyHook)
 import           XMonad.Actions.Navigation2D
 import           XMonad.Actions.ShowText        (handleTimerEvent)
 
-import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops      (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.SetWMName
 import           XMonad.Hooks.UrgencyHook       (NoUrgencyHook (..),
                                                  withUrgencyHook)
 
+import           XMonad.Util.Run                (spawnPipe)
 import           XMonad.Util.SpawnOnce          (spawnOnOnce)
 
 import           Keys                           (myKeys)
 import           Layout                         (myLayoutHook)
--- import           Logging                        (eventLogHook)
+import           Logging                        (xmobarLogHook)
 import           Managers                       (myManageHook)
 import qualified Workspaces
 
 main :: IO ()
-main = xmonad =<< xmobar myConfig
-  where
-    myConfig =
-      withUrgencyHook NoUrgencyHook
+main = do
+  xmproc <- spawnPipe "xmobar"
+  xmonad $ withUrgencyHook NoUrgencyHook
       . ewmh
       . withNavigation2DConfig def
         { defaultTiledNavigation = hybridOf sideNavigation centerNavigation
@@ -45,9 +45,7 @@ main = xmonad =<< xmobar myConfig
         , layoutHook         = desktopLayoutModifiers myLayoutHook
         , logHook            = logHook desktopConfig
                                 <+> historyHook
-                                <+> dynamicLog
-                                -- <+> eventLogHook
-
+                                <+> xmobarLogHook xmproc
         , manageHook         = manageHook desktopConfig
                                 <+> myManageHook
 
@@ -60,10 +58,11 @@ main = xmonad =<< xmobar myConfig
         , workspaces         = Workspaces.numbered
         }
 
+  where
     startup = do
-          startupHook desktopConfig
-          spawnOnOnce "2" "thunderbird"
-          spawnOnOnce "3" "slack"
-          spawnOnOnce "3" "signal-desktop"
-          spawnOnOnce "9" "spotify"
-          setWMName "LG3D" -- Java app focus fix
+      startupHook desktopConfig
+      spawnOnOnce "2" "thunderbird"
+      spawnOnOnce "3" "slack"
+      spawnOnOnce "3" "signal-desktop"
+      spawnOnOnce "9" "spotify"
+      setWMName "LG3D" -- Java app focus fix
